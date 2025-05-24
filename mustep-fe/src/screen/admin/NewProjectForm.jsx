@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 import MarkdownEditor from "../../components/admin/MarkdownEditor";
+import axios from 'axios';
 
 const Container = styled.div`
   margin: 0 auto;
@@ -146,6 +147,8 @@ export default function NewProjectForm() {
     e.preventDefault();
     if (!window.confirm("등록하시겠습니까?")) return;
 
+    
+
     const formData = new FormData();
     formData.append("company_name", companyName);
     formData.append("title", title);
@@ -162,7 +165,7 @@ export default function NewProjectForm() {
     }
 
     try {
-      const res = await fetch("/api/projects", { method: "POST", body: formData });
+      const res = await axios("/api/projects", { method: "POST", body: formData });
       if (!res.ok) throw new Error("서버 에러");
       navigate("/admin");
     } catch (err) {
