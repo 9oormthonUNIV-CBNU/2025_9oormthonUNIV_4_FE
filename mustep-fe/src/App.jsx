@@ -1,35 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router";
+import Root from "./components/Root";
+import MainPage from "./screen/MainPage";
+import LoginPage from "./screen/LoginPage";
+import RegisterPage from "./screen/RegisterPage";
+import AuthLayout from "./components/auth/AuthLayout";
+import ProjectList from "./screen/project/ProjectList";
+import ProjectDetail from "./screen/project/ProjectDetail";
+import ProjectTeamList from "./screen/project/ProjectTeamList";
+import NewTeam from "./screen/project/NewTeamForm";
+import TeamDetail from "./screen/team/TeamDetail";
+import TeamApplyForm from "./screen/team/TeamApplyForm";
+import NewNoticeForm from "./screen/team/NewNoticeForm";
+import TeamEditForm from "./screen/team/TeamEditForm";
+import NotFound from "./screen/NotFound";
+import MyPage from "./screen/ProfilePage";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <BrowserRouter>
+      <Routes>
+        {/* 기본 라우팅 홈페이지로 리다이렉트 */}
+        <Route path="/" element={<Root />}>
+          <Route index element={<MainPage />} />
 
-export default App
+          {/* 프로젝트 관련 페이지 라우팅 */}
+          <Route path="projects">
+            <Route index element={<ProjectList />} />
+            <Route path=":projectId">
+              <Route index element={<ProjectDetail/>} />
+              <Route path="teams" element={<ProjectTeamList />} />
+              <Route path="newteam" element={<NewTeam />}/>
+            </Route>
+          </Route>
+
+          {/* 팀 관련 페이지 라우팅 */}
+          <Route path="teams">
+            <Route path=":teamId" >
+              <Route index element={<TeamDetail />}/>
+              <Route path="apply" element={<TeamApplyForm />} />
+              <Route path="newnotice" element={<NewNoticeForm/>} />
+              <Route path="edit" element={<TeamEditForm />} />
+            </Route>
+          </Route>
+
+          {/* 프로필 관련 페이지 라우팅 */}
+          <Route path="profile">
+            <Route path=":uid" element={<MyPage />}/>
+          </Route>
+        </Route>
+
+        {/* 인증관련 페이지 라우팅 */}
+        <Route element={<AuthLayout />}>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+        </Route>
+
+        {/* 관리자 페이지 라우팅 */}
+        <Route path="admin">
+          <Route index />
+          <Route path="newproject" />
+        </Route>
+
+        {/* 잘못된 주소 접근 시 라우팅 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;
