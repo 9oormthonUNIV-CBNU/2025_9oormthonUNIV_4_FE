@@ -14,6 +14,9 @@ import NewNoticeForm from "./screen/team/NewNoticeForm";
 import TeamEditForm from "./screen/team/TeamEditForm";
 import NotFound from "./screen/NotFound";
 import MyPage from "./screen/ProfilePage";
+import AdminPage from "./screen/admin/AdminPage";
+import AdminLayout from "./components/admin/AdminLayout";
+import NewProjectForm from "./screen/admin/NewProjectForm";
 
 const App = () => {
   return (
@@ -56,9 +59,9 @@ const App = () => {
         </Route>
 
         {/* 관리자 페이지 라우팅 */}
-        <Route path="admin">
-          <Route index />
-          <Route path="newproject" />
+        <Route path="admin" element={<AdminLayout />} >
+          <Route index element={<AdminPage />} />
+          <Route path="newproject" element={<NewProjectForm />} />
         </Route>
 
         {/* 잘못된 주소 접근 시 라우팅 */}
