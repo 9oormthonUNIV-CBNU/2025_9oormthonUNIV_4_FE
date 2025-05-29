@@ -6,6 +6,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import axios from "axios";
 import theme from "../styles/Theme";
+import Logo from "../assets/logo.png"
 
 const PageWrapper = styled.main`
   flex: 1; /* 헤더+풋터 제외한 영역 채우기 */
@@ -75,7 +76,7 @@ const LoginPage = () => {
     <PageWrapper>
       <Card>
         <Link to="/">
-          <LogoImg src="../public/imgs/logo.png" />
+          <LogoImg src={Logo} />
         </Link>
         <Title>로그인</Title>
         <GoogleAuthBtn onClick={handleLogin}>

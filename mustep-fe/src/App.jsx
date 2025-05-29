@@ -20,8 +20,12 @@ import NewProjectForm from "./screen/admin/NewProjectForm";
 import GlobalStyle from "./styles/GlobalStyles";
 import { ThemeProvider } from "styled-components";
 import theme from "./styles/Theme";
+import UnivVerifyPage from "./screen/UnivVerifyPage";
+import axios from "axios";
 
 const App = () => {
+  axios.defaults.withCredentials = true
+
   return (
     <>
       <GlobalStyle />
@@ -61,6 +65,7 @@ const App = () => {
           <Route element={<AuthLayout />}>
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+            <Route path="university" element={<UnivVerifyPage />} />
           </Route>
 
           {/* 관리자 페이지 라우팅 */}

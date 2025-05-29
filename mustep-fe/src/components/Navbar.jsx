@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import Logo from "../assets/logo.png";
 
 const NavbarContainer = styled.div`
   background-color: #f0f3f5;
@@ -12,13 +13,11 @@ const NavbarContainer = styled.div`
 
 const LogoGroup = styled.div`
   display: flex;
-
-`
+`;
 
 const NavItemGroup = styled.div`
   display: flex;
-
-`
+`;
 
 const BtnGroup = styled.div`
   margin-left: auto;
@@ -28,26 +27,24 @@ const BtnGroup = styled.div`
 
 const AuthBtn = styled.button`
   padding: 7px 7px 7px 7px;
-
-`
+`;
 
 const LogoImg = styled.img`
   width: 200px;
-
-`
+`;
 
 const Navbar = () => {
   const navigate = useNavigate();
 
   return (
     <NavbarContainer>
-      <LogoGroup>
-        <LogoImg src="../public/imgs/logo.png" alt="logo" />
-      </LogoGroup>
+      <Link to="/">
+        <LogoGroup>
+          <LogoImg src={Logo} alt="logo" />
+        </LogoGroup>
+      </Link>
 
-      <NavItemGroup>
-
-      </NavItemGroup>
+      <NavItemGroup></NavItemGroup>
       <BtnGroup>
         <AuthBtn onClick={() => navigate("/login")}>Login</AuthBtn>
         <AuthBtn>Join</AuthBtn>

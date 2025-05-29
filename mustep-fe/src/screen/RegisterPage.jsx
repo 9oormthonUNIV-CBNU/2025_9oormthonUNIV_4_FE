@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-// import styled from "styled-components";
-import { Link } from "react-router";
 import styled from "styled-components";
-// import theme from "../styles/Theme";
+import { FcGoogle } from "react-icons/fc";
+import { Link, useNavigate } from "react-router";
+import { GoogleLogin } from "@react-oauth/google";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import axios from "axios";
+import theme from "../styles/Theme";
+import Logo from "../assets/logo.png";
 
 const PageWrapper = styled.main`
   flex: 1; /* 헤더+풋터 제외한 영역 채우기 */
@@ -37,7 +41,6 @@ const Title = styled.h2`
   margin-bottom: 40px;
   color: #1f2533;
 `;
-
 const RegisterForm = styled.form`
   display: flex;
   flex-direction: column;
@@ -54,82 +57,38 @@ const Label = styled.label`
   flex: 0 0 120px;
   text-align: left;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: bold;
   color: #1f2533;
 `;
 
 const Input = styled.input`
-  flex: 1;
   padding: 16px;
+  width: 40%;
   background: ${(props) => props.theme.colors.gray2};
   border: none;
   border-radius: 12px;
   font-size: 1rem;
   color: #333;
   &::placeholder {
-    color: #aaa;
-  }
-  &:disabled {
-    background: ${(props) => props.theme.colors.gray4};
+    color: ${({ theme }) => theme.colors.gray4};
   }
 `;
 
-// 이메일 + 전송 버튼을 묶는 영역
-const EmailGroup = styled.div`
-  display: flex;
+const Textarea = styled.textarea`
   flex: 1;
-`;
-
-// 좌측 둥근 모서리만
-const EmailInput = styled(Input)`
-  border-radius: 12px 0 0 12px;
-`;
-
-// 우측 둥근 모서리만
-const AuthBtn = styled.button`
-  background: ${(props) => props.theme.colors.primary};
-  border: none;
-  padding: 0 20px;
-  font-size: 0.9rem;
-  border-radius: 0 12px 12px 0;
-  color: white;
-  cursor: pointer;
-  &:disabled {
-    background: ${(props) => props.theme.colors.gray4};
-    color: white;
-    cursor: default;
-  }
-`;
-
-const MailCheckLabel = styled.div`
-  flex: 1;
-  text-align: right;
-  justify-content: end;
-  margin: 0px 0px;
-  font-size: 14px;
-  color: ${(props) => props.theme.colors.gray5};
-`;
-
-// 버튼 두 개를 나란히
-const ButtonsRow = styled.div`
-  display: flex;
-  gap: 12px;
-  margin-top: 40px;
-`;
-
-// 나중에 할래요 버튼
-const LaterBtn = styled.button`
-  flex: 0 0 120px;
-  padding: 16px 0;
+  padding: 16px;
+  max-height: 200px;
+  width: 300px;
   background: ${(props) => props.theme.colors.gray2};
-  color: #1f2533;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
-  cursor: pointer;
+  color: #333;
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.gray4};
+  }
 `;
 
-// 완료 버튼 (활성/비활성)
 const SubmitBtn = styled.button`
   flex: 1;
   padding: 16px 0;
@@ -141,91 +100,91 @@ const SubmitBtn = styled.button`
   font-weight: 500;
   cursor: pointer;
   &:disabled {
-    background: ${(props) => props.theme.colors.gray5};
+    background: ${(props) => props.theme.colors.gray4};
     cursor: default;
   }
 `;
 
 const RegisterPage = () => {
   const [univ, setUniv] = useState("");
-  const [email, setEmail] = useState("");
-  const [isSent, setIsSent] = useState(false);
-  const [code, setCode] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [major, setMajor] = useState("");
+  const [userInfo, setUserInfo] = useState("");
+  const navigate = useNavigate();
 
-  const handleSendEmail = () => {
-    // TODO: 이메일 전송 로직
-    setIsSent(true);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: 인증번호 검증 로직
+
+    try {
+      const payload = {
+        nickname: nickname,
+        major: major,
+        university: univ,
+        introduce: userInfo,
+      };
+
+      const res = await axios.post(`${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`, payload);
+
+      console.log(res);
+      navigate("/university");
+    } catch (err) {
+      console.error(err);
+      // TODO: 실패시 모달 띄우기 등
+      console.error(err);
+    }
+
+    // 성공 로직
   };
 
   return (
     <PageWrapper>
       <Card>
         <Link to="/">
-          <LogoImg src="../public/imgs/logo.png" />
+          <LogoImg src={Logo} />
         </Link>
-        <Title>학교 인증하기</Title>
+        <Title>프로필 입력하기</Title>
         <RegisterForm onSubmit={handleSubmit}>
           <FieldRow>
-            <Label htmlFor="univ">학교 이름</Label>
+            <Label htmlFor="nickname">닉네임</Label>
+            <Input
+              id="nickname"
+              placeholder="닉네임을 입력해주세요."
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              required
+            />
+          </FieldRow>
+          <FieldRow>
+            <Label htmlFor="univ">대학교명</Label>
             <Input
               id="univ"
-              placeholder="학교 이름을 입력해주세요."
+              placeholder="교명을 입력해주세요."
               value={univ}
               onChange={(e) => setUniv(e.target.value)}
+              required
             />
           </FieldRow>
           <FieldRow>
-            <Label htmlFor="email">학교 이메일</Label>
-            <EmailGroup>
-              <EmailInput
-                id="email"
-                placeholder="학교 이메일을 입력해주세요."
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <AuthBtn
-                type="button"
-                disabled={!univ || !email}
-                onClick={handleSendEmail}
-              >
-                전송
-              </AuthBtn>
-            </EmailGroup>
-          </FieldRow>
-          <FieldRow>
-            <MailCheckLabel>
-              *메일 확인이 안될 시 스팸 메일함을 확인해주세요.
-            </MailCheckLabel>
-          </FieldRow>
-          <FieldRow>
-            <Label htmlFor="certNum">인증번호</Label>
+            <Label htmlFor="major">대학 전공</Label>
             <Input
-              id="certNum"
-              placeholder="인증번호 4자리"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              disabled={!isSent}
-              maxLength={4}
+              id="major"
+              placeholder="전공을 입력해주세요."
+              value={major}
+              onChange={(e) => setMajor(e.target.value)}
+              required
             />
           </FieldRow>
-          <ButtonsRow>
-            <LaterBtn
-              type="button"
-              onClick={() => {
-                /* */
-              }}
-            >
-              나중에 할래요
-            </LaterBtn>
-            <SubmitBtn type="submit" disabled={!isSent || code.length < 4}>
-              완료
-            </SubmitBtn>
-          </ButtonsRow>
+          <FieldRow>
+            <Label htmlFor="userInfo">자기소개</Label>
+            <Textarea
+              id="userInfo"
+              placeholder="자기소개를 입력해주세요."
+              value={userInfo}
+              onChange={(e) => setUserInfo(e.target.value)}
+              required
+            />
+          </FieldRow>
+          <SubmitBtn type="submit">완료</SubmitBtn>
         </RegisterForm>
       </Card>
     </PageWrapper>
