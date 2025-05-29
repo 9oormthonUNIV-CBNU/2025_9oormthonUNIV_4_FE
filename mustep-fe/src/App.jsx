@@ -18,6 +18,8 @@ import AdminPage from "./screen/admin/AdminPage";
 import AdminLayout from "./components/admin/AdminLayout";
 import NewProjectForm from "./screen/admin/NewProjectForm";
 import GlobalStyle from "./styles/GlobalStyles";
+import { ThemeProvider } from "styled-components";
+import theme from "./styles/Theme";
 
 const App = () => {
   return (
