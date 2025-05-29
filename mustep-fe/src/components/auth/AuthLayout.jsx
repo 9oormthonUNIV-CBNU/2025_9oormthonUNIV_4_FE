@@ -1,13 +1,22 @@
-import React from 'react'
-import { Outlet } from 'react-router'
+import React from "react";
+import { Outlet } from "react-router";
+import styled from "styled-components";
+import Navbar from "../Navbar";
+import Footer from "../Footer";
 
 const AuthLayout = () => {
+  const Wrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  `;
   return (
-    <div>
-      ff
-      <Outlet/>
-    </div>
-  )
-}
+    <Wrapper>
+      <Navbar />
+      <Outlet />
+      <Footer />
+    </Wrapper>
+  );
+};
 
-export default AuthLayout
+export default AuthLayout;
