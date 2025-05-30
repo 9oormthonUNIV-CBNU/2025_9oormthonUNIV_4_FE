@@ -16,7 +16,7 @@ const Overlay = styled.div`
 const Card = styled.div`
   background: #fff;
   border-radius: 24px;
-  padding: 40px 40px;
+  padding: 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,6 +28,7 @@ const StyledAlert = styled(AlertIcon)`
   width: 56px;
   height: 56px;
   margin-bottom: 24px;
+  font-weight: bold;
 `;
 
 const StyledCheck = styled(CheckIcon)`
@@ -50,12 +51,13 @@ const BtnBlock = styled.div`
 `;
 
 const RemoveBtn = styled.button`
-  padding: 20px 20px;
+  padding: 15px 20px;
   background: ${({ theme }) => theme.colors.gray2};
   color: ${({ theme }) => theme.colors.gray5};
   border: none;
   border-radius: 16px;
   font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
   &:hover {
     opacity: 0.9;
@@ -63,12 +65,13 @@ const RemoveBtn = styled.button`
 `;
 
 const CancleBtn = styled.button`
-  padding: 20px 20px;
+  padding: 15px 20px;
   background: ${({ theme }) => theme.colors.primary};
   color: #fff;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
   &:hover {
     opacity: 0.9;

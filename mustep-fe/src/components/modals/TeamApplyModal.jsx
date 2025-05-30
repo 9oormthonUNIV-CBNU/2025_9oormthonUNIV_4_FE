@@ -12,65 +12,67 @@ const Overlay = styled.div`
   z-index: 999;
 `;
 
-const Card = styled.div`
-  background: #fff;
-  border-radius: 24px;
-  padding: 40px 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 30vw;
-  width: 90%;
-`;
-
-const Title = styled.p`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1f2533;
-  margin: 0 0 24px;
-`;
-
 const CloseBtn = styled(CloseIcon)`
   width: 24px;
   height: 24px;
   cursor: pointer;
 `;
 
+const Card = styled.div`
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 80px;
+  display: flex;
+  flex-direction: column;
+  width: 30vw;
+`;
+
+const Title = styled.p`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2533;
+  margin: 0 0 24px;
+  text-align: center;
+`;
+
 const MemberList = styled.ul`
-  width: 100%;
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 32px;
 `;
 
 const MemberItem = styled.li`
+  gap: 20px;
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 12px 16px;
+  padding: 16px 20px;
   border-radius: 12px;
   background: ${({ theme }) => theme.colors.gray1};
-  border: "none";
 `;
 
 const InfoGroup = styled.div`
+  width: 30%;
   display: flex;
   align-items: center;
   gap: 12px;
 `;
+const UserProfile = styled.img`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+`;
 
 const NameText = styled.span`
   font-size: 1rem;
+  font-weight: 500;
   color: #1f2533;
 `;
 
 const DetailGroup = styled.div`
-  display: flex;
-  align-items: flex-start;
+  width: 50%;
 `;
 
 const ApplyDate = styled.span`
@@ -81,24 +83,22 @@ const ApplyDate = styled.span`
 
 const ApplicationBtn = styled.button`
   margin-left: auto;
-  padding: 8px 14px;
-  background: ${({theme}) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.white};
-
+  width: 30%;
+  padding: 8px 16px;
+  background: ${({ theme }) => theme.colors.primary};
+  color: #fff;
+  border: none;
   border-radius: 8px;
   font-size: 0.9rem;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
-  border: 0px solid;
   &:hover {
     background: ${({ theme }) => theme.colors.primary_lite};
   }
 `;
 
 
-const UserProfile = styled.img`
-  width: 30px;
-`;
+
 const TeamApplyModal = ({ members, setShowModal }) => {
   return (
     <Overlay>

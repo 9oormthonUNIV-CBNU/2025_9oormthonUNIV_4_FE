@@ -17,7 +17,7 @@ const Overlay = styled.div`
 `;
 
 const Card = styled.div`
-  background: #fff;
+  background: white;
   border-radius: 24px;
   padding: 40px 80px;
   display: flex;
@@ -34,12 +34,6 @@ const Title = styled.p`
   margin: 0 0 24px;
 `;
 
-const CloseBtn = styled(CloseIcon)`
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-`;
-
 const MemberList = styled.ul`
   width: 100%;
   list-style: none;
@@ -49,7 +43,7 @@ const MemberList = styled.ul`
   flex-direction: column;
   gap: 16px;
   margin-bottom: 32px;
-`;
+`;  
 
 const MemberItem = styled.li`
   display: flex;
@@ -66,21 +60,30 @@ const MemberItem = styled.li`
 const InfoGroup = styled.div`
   display: flex;
   align-items: center;
+  width: 20%;
   gap: 12px;
 `;
 
 const NameText = styled.span`
   font-size: 1rem;
+  font-weight: 500;
   color: #1f2533;
 `;
 
 const DetailGroup = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  font-size: 0.85rem;
-  color: ${({ theme }) => theme.colors.gray6};
+  width: 30%;
+  margin-left: 24px;
   gap: 4px;
+  
+  & > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: ${({ theme }) => theme.colors.gray6};
+  }
 `;
 
 const RemoveBtn = styled.button`
@@ -98,6 +101,14 @@ const RemoveBtn = styled.button`
   }
 `;
 
+const RemovedText = styled.span`
+  margin-left: auto;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #666;
+  width: 35%;
+`;
+
 const SaveBtn = styled.button`
   width: 100%;
   padding: 14px 0;
@@ -106,6 +117,7 @@ const SaveBtn = styled.button`
   border: none;
   border-radius: 12px;
   font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
   &:hover {
     opacity: 0.9;
@@ -114,19 +126,20 @@ const SaveBtn = styled.button`
 
 const UserProfile = styled.img`
   width: 30px;
+  height: 30px;
+  border-radius: 50%;
 `;
+
+const CloseBtn = styled(CloseIcon)`
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+`;
+
+
 
 const TeamManageModal = ({ members, setMembers, setShowModal }) => {
   const [showAlert, setShowAlert] = useState(false);
-
-  const handleRemove = (id) => {
-    setShowAlert(true);
-    setMembers((prev) =>
-      prev.map((m) =>
-        m.id === id ? { ...m, removed: true, removedAt: new Date() } : m
-      )
-    );
-  };
 
   useEffect(() => {
     setMembers((ms) =>
@@ -137,6 +150,17 @@ const TeamManageModal = ({ members, setMembers, setShowModal }) => {
       }))
     );
   }, [setMembers]);
+
+  const handleRemove = (id) => {
+    setShowAlert(true);
+    setMembers((prev) =>
+      prev.map((m) =>
+        m.id === id ? { ...m, removed: true, removedAt: new Date() } : m
+      )
+    );
+  };
+
+
 
   const handleSave = () => {
     const toRemoveIds = members.filter((m) => m.removed).map((m) => m.id);
@@ -158,32 +182,25 @@ const TeamManageModal = ({ members, setMembers, setShowModal }) => {
           <Title>팀 관리하기</Title>
           <MemberList>
             {members.map((m) => (
-              <MemberItem key={m.id}>
+              <MemberItem key={m.id} removed={m.removed}>
                 <InfoGroup>
                   <UserProfile src={m.imgUrl} />
                   <NameText>{m.nickname}</NameText>
                 </InfoGroup>
                 <DetailGroup>
-                  <InfoGroup>
-                    <UserIcon />
-                    <span>{m.role}</span>
-                  </InfoGroup>
-                  <InfoGroup>
-                    <CalendarIcon />
+                  <div>
+                    <UserIcon width={15} height={15}/>
+                    <span style={{color: "black", fontWeight: "bold"}}>{m.role}</span>
+                  </div>
+                  <div>
+                    <CalendarIcon width={15} height={15} />
                     <span>{formatTimeAgo(new Date(m.joined))} 가입</span>
-                  </InfoGroup>
+                  </div>
                 </DetailGroup>
                 {m.removed ? (
-                  // 내보내기 후 UI
-                  <span
-                    style={{
-                      marginLeft: "auto",
-                      fontSize: "0.9rem",
-                      color: "#666",
-                    }}
-                  >
+                  <RemovedText>
                     {formatTimeAgo(m.removedAt)} “내보내기” 되었습니다
-                  </span>
+                  </RemovedText>
                 ) : (
                   <RemoveBtn onClick={() => handleRemove(m.id)}>
                     내보내기

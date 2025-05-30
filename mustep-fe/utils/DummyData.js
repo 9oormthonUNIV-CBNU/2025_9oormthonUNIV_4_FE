@@ -14,7 +14,7 @@ const DummyTeamMember = [
   },
   {
     id: 2,
-    nickname: "string2",
+    nickname: "string222",
     major: "string2",
     university: "string2",
     introduce: "string2",

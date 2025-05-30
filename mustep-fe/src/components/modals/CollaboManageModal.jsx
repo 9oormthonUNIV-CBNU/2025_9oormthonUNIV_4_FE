@@ -4,6 +4,7 @@ import CloseIcon from "../../assets/close_btn.svg";
 import CheckedIcon from "../../assets/link_checked_icon.svg";
 import UnCheckedIcon from "../../assets/link_unchecked_icon.svg";
 import AddLink from "./AddLink";
+import { getFaviconUrl } from "../../../utils/Utils";
 
 const Overlay = styled.div`
   position: fixed;
@@ -26,25 +27,16 @@ const Card = styled.div`
   width: 100%;
 `;
 
+const CloseWrapper = styled.div`
+  align-self: flex-end;
+  cursor: pointer;
+`;
+
 const Title = styled.p`
   font-size: 1.5rem;
   font-weight: bold;
   color: #1f2533;
   margin: 0 0 24px;
-`;
-
-const CheckedBtn = styled(CheckedIcon)`
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  margin-left: auto;
-`;
-
-const UnCheckedBtn = styled(UnCheckedIcon)`
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  margin-left: auto;
 `;
 
 const LinkList = styled.ul`
@@ -86,16 +78,27 @@ const InfoGroup = styled.div`
 
 const NameText = styled.span`
   font-size: 1rem;
+  font-weight: 600;
   color: #1f2533;
+`;
+
+const UrlText = styled.span`
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme.colors.gray6};
 `;
 
 const DetailGroup = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  font-size: 0.85rem;
-  color: ${({ theme }) => theme.colors.gray6};
   gap: 4px;
+`;
+
+const BtnBlock = styled.div`
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
 `;
 
 const CancleBtn = styled.button`
@@ -113,24 +116,19 @@ const CancleBtn = styled.button`
   }
 `;
 
-const BtnBlock = styled.div`
-  display: flex;
-  gap: 20px;
-  width: 100%;
-  justify-content: center;
-`;
-
 const RemoveBtn = styled.button`
   width: 40%;
   padding: 14px 0;
-  background: ${({ theme }) => theme.colors.primary};
-  color: #fff;
+  background: ${({ disabled, theme }) =>
+    disabled ? theme.colors.gray4 : theme.colors.primary};
+  color: white;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
-  cursor: pointer;
+  font-weight: 600;
+  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
   &:hover {
-    opacity: 0.9;
+    opacity: ${({ disabled }) => (disabled ? 1 : 0.9)};
   }
 `;
 
@@ -139,10 +137,22 @@ const AddBtn = styled.p`
   color: ${({ theme }) => theme.colors.gray4};
   border: none;
   border-radius: 12px;
-  font-size: 2rem;
+  font-size: 1.5rem;
   margin: 0px;
 `;
+const CheckedBtn = styled(CheckedIcon)`
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin-left: auto;
+`;
 
+const UnCheckedBtn = styled(UnCheckedIcon)`
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin-left: auto;
+`;
 const CollaboIcon = styled.img`
   width: 30px;
 `;
@@ -172,15 +182,11 @@ const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal }) => {
             {collaboes.map((item) => (
               <LinkItem key={item.id}>
                 <InfoGroup>
-                  <CollaboIcon src={item.imgUrl} />
+                  <CollaboIcon src={getFaviconUrl(item.url, { size: 24 })} />
                 </InfoGroup>
                 <DetailGroup>
-                  <InfoGroup>
-                    <span>{item.name}</span>
-                  </InfoGroup>
-                  <InfoGroup>
-                    <span>{item.url}</span>
-                  </InfoGroup>
+                  <NameText>{item.name}</NameText>
+                  <UrlText>{item.url}</UrlText>
                 </DetailGroup>
                 {selectedIds.includes(item.id) ? (
                   <CheckedBtn onClick={() => toggleSelect(item.id)} />
@@ -190,14 +196,17 @@ const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal }) => {
               </LinkItem>
             ))}
             <AddItem onClick={() => setShowAddModal(true)}>
-              <InfoGroup>
-                <AddBtn>+</AddBtn>
-              </InfoGroup>
+              <AddBtn>+</AddBtn>
             </AddItem>
           </LinkList>
           <BtnBlock>
             <CancleBtn onClick={() => setShowModal(false)}>닫기</CancleBtn>
-            <RemoveBtn onClick={handleRemove}>삭제하기</RemoveBtn>
+            <RemoveBtn
+              disabled={selectedIds.length === 0}
+              onClick={handleRemove}
+            >
+              삭제하기
+            </RemoveBtn>
           </BtnBlock>
         </Card>
       </Overlay>

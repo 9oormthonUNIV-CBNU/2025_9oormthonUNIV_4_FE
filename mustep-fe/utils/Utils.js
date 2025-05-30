@@ -34,3 +34,17 @@ export const formatTimeAgo = (date) => {
   }
   return `${Math.floor(seconds)}초전`;
 };
+
+export const getFaviconUrl = (
+  url,
+  { size = 32, fallback = "/favicon.png" } = {}
+) => {
+  try {
+    // URL 생성자에서 예외가 나면 catch로 빠집니다.
+    const { hostname } = new URL(url);
+    // Google Favicon API 사용
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=${size}`;
+  } catch (e) {
+    return fallback;
+  }
+};

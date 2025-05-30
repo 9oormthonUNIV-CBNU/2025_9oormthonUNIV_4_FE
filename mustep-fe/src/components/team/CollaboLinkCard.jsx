@@ -2,6 +2,7 @@
 import React from "react";
 import styled from "styled-components";
 import Pagination from "./Pagination";
+import { getFaviconUrl } from "../../../utils/Utils";
 
 const CollaboLinkList = styled.ul`
   list-style: none;
@@ -44,7 +45,7 @@ const CollaboLinkCard = ({
                 gap: "12px",
               }}
             >
-              <img style={{ width: "30px" }} src={item.imgUrl} />
+              <img style={{ width: "30px" }} src={getFaviconUrl(item.url, {size: 24})} />
               <div>
                 <div
                   style={{
