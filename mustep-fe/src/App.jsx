@@ -24,7 +24,7 @@ import UnivVerifyPage from "./screen/UnivVerifyPage";
 import axios from "axios";
 
 const App = () => {
-  axios.defaults.withCredentials = true
+
 
   return (
     <>
