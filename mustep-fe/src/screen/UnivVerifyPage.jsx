@@ -170,6 +170,7 @@ const UnivVerifyPage = () => {
       // 2xx 응답이 오면 성공
       if (res.status >= 200 && res.status < 300) {
         setIsSent(true);
+        console.log("성공공")
       } else {
         // 비정상 응답은 에러 처리
         setShowError(true);

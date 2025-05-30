@@ -112,6 +112,9 @@ const RegisterPage = () => {
   const [userInfo, setUserInfo] = useState("");
   const navigate = useNavigate();
 
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -126,6 +129,8 @@ const RegisterPage = () => {
       const res = await axios.post(`${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`, payload);
 
       console.log(res);
+
+
       navigate("/university");
     } catch (err) {
       console.error(err);
