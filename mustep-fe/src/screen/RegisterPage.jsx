@@ -134,7 +134,7 @@ const RegisterPage = () => {
           "Content-Type": "application/json",
           // 'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJraXRlMDk2NjhAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDg2MTExOTIsImV4cCI6MTc0ODgyNzE5Mn0.2Ml7LL7b_0eMtEPfL8hzdlF5i4T1yF5Q09SPMJTOdDK6HWoRaSPqBcdDH-ChXpwVK1p-RFxAChmFxul35m7vEA`  
         },
-        withCredentials: true, // ← 이게 핵심!
+        withCredentials: true, 
       }
     );
 

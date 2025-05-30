@@ -3,6 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import CalendarIcon from "../../assets/calendar.svg";
 import UserIcon from "../../assets/user_icon.svg";
+import { useNavigate, useLocation } from "react-router";
 
 const MemberHeader = styled.div`
   display: flex;
@@ -59,15 +60,18 @@ const JoinDate = styled.div`
   font-weight: bold;
   color: ${({ theme }) => theme.colors.gray4};
 `;
-const MemberCard = ({ TextRow, ManageBtn }) => {
+const MemberCard = ({ TextRow, ManageBtn, setShowModal, setShowApplyModal }) => {
+  const navigate = useNavigate();
+    const { pathname } = useLocation();
+
   return (
     <>
       <MemberHeader>
         <h2>팀원 목록</h2>
         {/* 아래는 팀장 권한이 있을 시 활성화 */}
         <ControlBtnBlock>
-          <ManageBtn $variant="control">팀원관리</ManageBtn>
-          <ManageBtn $variant="control">팀 신청자 보기</ManageBtn>
+          <ManageBtn $variant="control" onClick={() => {setShowModal(true);}}>팀원관리</ManageBtn>
+          <ManageBtn $variant="control" onClick={() => {setShowApplyModal(true);}}>팀 신청자 보기</ManageBtn>
         </ControlBtnBlock>
       </MemberHeader>
 
