@@ -132,11 +132,9 @@ const RegisterPage = () => {
       `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
       // 2) body로 보낼 데이터
       payload,
-      // 3) config: headers + withCredentials
       {
         headers: {
           "Content-Type": "application/json",
-          // 'Authorization': `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJraXRlMDk2NjhAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDg2MTExOTIsImV4cCI6MTc0ODgyNzE5Mn0.2Ml7LL7b_0eMtEPfL8hzdlF5i4T1yF5Q09SPMJTOdDK6HWoRaSPqBcdDH-ChXpwVK1p-RFxAChmFxul35m7vEA`  
         },
         withCredentials: true, 
       }
