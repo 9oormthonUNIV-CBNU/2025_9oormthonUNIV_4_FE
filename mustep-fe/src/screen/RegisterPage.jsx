@@ -117,19 +117,30 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const payload = {
+      nickname: nickname,
+      major: major,
+      university: univ,
+      introduce: userInfo,
+      imgUrl:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkMrDfL1jdluKhYhszOe_NOrvVfGhv1l5EsdI8-mHkVEo4g4ci1lgI7QTbpNGgmQdgEsfPSOWidY1eusytDJSAWMomCi-6kyOZBf1Pbw4",
+    };
     try {
-      const payload = {
-        nickname: nickname,
-        major: major,
-        university: univ,
-        introduce: userInfo,
-      };
 
-      const res = await axios.post(`${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`, payload);
+    const res = await axios.post(
+      // 1) URL
+      `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
+      // 2) body로 보낼 데이터
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, 
+      }
+    );
 
-      console.log(res);
-
+      console.log(res.data);
 
       navigate("/university");
     } catch (err) {
