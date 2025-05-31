@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const FooterContainer = styled.div`
-  background-color: #f0f3f5;
+  background-color: #34353A;
   height: 147px;
   padding: 0 360px 0 360px;
   display: flex;
@@ -13,7 +13,9 @@ const FooterContainer = styled.div`
 const LeftGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  color: #F0F3F5;
+  margin-bottom: 10px;
 `;
 
 const RepresenterLine = styled.div`
@@ -23,16 +25,17 @@ const RepresenterLine = styled.div`
 `
 
 const InfoLine = styled.div`
+  font-size: 14px;
+  font-weight: none;
 `;
 
 const LinkGroup = styled.div`
   display: flex;
-  gap: 16px;
+  gap: 8px;
   margin-top: 4px;
 `;
 
 const FooterLink = styled.a`
-  color: #666;
   text-decoration: none;
   &:hover {
     text-decoration: underline;
@@ -40,8 +43,9 @@ const FooterLink = styled.a`
 `;
 
 const RightGroup = styled.div`
-  color: #999;
+  color: #F0F3F5;
   white-space: nowrap;
+  margin-bottom: 10px;
 `;
 
 const Footer = () => {
