@@ -10,6 +10,11 @@ const NavbarContainer = styled.div`
   padding: 0 360px 0 360px;
   display: flex;
   align-items: center;
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
 `;
 
 const LogoGroup = styled.div`
@@ -36,7 +41,7 @@ const AuthBtn = styled.button`
   height: 36px;
   font-size: 16px;
   font-weight: bold;
-  background-color: #DDE0E6;
+  background-color: #dde0e6;
   border: none;
   cursor: pointer;
 `;
@@ -68,14 +73,15 @@ const Navbar = () => {
           <LogoImg src={Logo} alt="logo" />
         </LogoGroup>
       </Link>
-          
-          <LogoText>기업 프로젝트</LogoText>
 
+      <Link to="/projects">
+        <LogoText>기업 프로젝트</LogoText>
+      </Link>
       <NavItemGroup></NavItemGroup>
       <BtnGroup>
         <AuthBtn onClick={() => navigate()}>
           <UserImg src={User} alt="user_icon" />
-           이름이름님
+          이름이름님
         </AuthBtn>
       </BtnGroup>
     </NavbarContainer>
