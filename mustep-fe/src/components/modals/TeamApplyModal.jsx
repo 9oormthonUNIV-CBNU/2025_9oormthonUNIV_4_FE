@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CloseIcon from "../../assets/close_btn.svg";
+import axios from "axios";
 
 const Overlay = styled.div`
   position: fixed;
@@ -78,8 +79,8 @@ const DetailGroup = styled.div`
 const ApplyDate = styled.span`
   font-size: 1rem;
   font-weight: 500;
-  color: ${({theme}) => theme.colors.gray4};
-`
+  color: ${({ theme }) => theme.colors.gray4};
+`;
 
 const ApplicationBtn = styled.button`
   margin-left: auto;
@@ -97,9 +98,45 @@ const ApplicationBtn = styled.button`
   }
 `;
 
+const TeamApplyModal = ({ teamId, setShowModal }) => {
+  const [applications, setApplications] = useState([]);
 
+  useEffect(() => {
+    const fetchGetApplications = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("⚠️ 토큰이 localStorage에 없습니다.");
+          return;
+        }
 
-const TeamApplyModal = ({ members, setShowModal }) => {
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_SERVER_END_POINT
+          }/api/v1/applications/teams/${teamId}/all`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+              // 필요시 토큰이나 다른 헤더 추가
+            },
+          }
+        );
+
+        if (res.data && res.data.data) {
+          const data = res.data.data;
+
+          setApplications(data);
+        }
+      } catch (err) {
+        console.error("지원서 정보 조회 실패", err);
+      }
+    };
+
+    fetchGetApplications();
+  }, []);
+
+  
   return (
     <Overlay>
       <Card>
@@ -111,16 +148,16 @@ const TeamApplyModal = ({ members, setShowModal }) => {
         </span>
         <Title>팀 신청 관리</Title>
         <MemberList>
-          {members.map((m) => (
-            <MemberItem key={m.id}>
+          {applications.map((a) => (
+            <MemberItem key={a.id}>
               <InfoGroup>
-                <UserProfile src={m.imgUrl} />
-                <NameText>{m.nickname}</NameText>
+                <UserProfile src={a.imgUrl} />
+                <NameText>{a.name}</NameText>
               </InfoGroup>
               <DetailGroup>
-                <ApplyDate>2025.5.21</ApplyDate>
+                <ApplyDate>asdasd</ApplyDate>
               </DetailGroup>
-              <ApplicationBtn >신청서 보기</ApplicationBtn>
+              <ApplicationBtn>신청서 보기</ApplicationBtn>
             </MemberItem>
           ))}
         </MemberList>

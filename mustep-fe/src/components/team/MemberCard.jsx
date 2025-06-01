@@ -25,7 +25,7 @@ const MemberCardContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   border-radius: 12px;
   padding: 20px;
-  width: 160px;
+  width: 200px;
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -43,10 +43,12 @@ const ProfileImg = styled.div`
   height: 30px;
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.gray2};
+  background-image: url((img));
+  
 `;
 
 const MemberName = styled.div`
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: #1f2533;
 `;
 const MemberRole = styled.div`
@@ -60,7 +62,7 @@ const JoinDate = styled.div`
   font-weight: bold;
   color: ${({ theme }) => theme.colors.gray4};
 `;
-const MemberCard = ({ TextRow, ManageBtn, setShowModal, setShowApplyModal }) => {
+const MemberCard = ({ members, TextRow, ManageBtn, setShowModal, setShowApplyModal }) => {
   const navigate = useNavigate();
     const { pathname } = useLocation();
 
@@ -77,19 +79,19 @@ const MemberCard = ({ TextRow, ManageBtn, setShowModal, setShowApplyModal }) => 
 
       <MemberList>
         {/* 예시: 나중에 members.map */}
-        {[1, 2, 3].map((m) => (
-          <MemberCardContainer key={m}>
+        {members.map((m) => (
+          <MemberCardContainer key={m.id}>
             <MemberCardHeader>
-              <ProfileImg />
-              <MemberName>미르미</MemberName>
+              <ProfileImg img={m.imgUrl}/>
+              <MemberName>{m.username}</MemberName>
             </MemberCardHeader>
             <TextRow>
               <UserIcon />
-              <MemberRole>팀장</MemberRole>
+              <MemberRole>{m.leader === true ? `팀장` : "팀원"}</MemberRole>
             </TextRow>
             <TextRow>
-              <CalendarIcon />
-              <JoinDate>8일전 가입</JoinDate>
+              <CalendarIcon width={15} />
+              <JoinDate>{m.joinedDaysAgo === 0 ? `오늘` : `${m.joinedDaysAgo}일전 가입`}</JoinDate>
             </TextRow>
           </MemberCardContainer>
         ))}
