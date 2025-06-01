@@ -52,12 +52,12 @@ const Btn = styled.button`
   }
 `;
 
-const AuthAlertModal = ({ onClose }) => {
+const AuthAlertModal = ({ onClose, emailError, setEmailError }) => {
   return (
     <Overlay>
       <Card>
         <StyledAlert />
-        <AlertMsg>인증번호를 다시 확인해주세요</AlertMsg>
+        <AlertMsg>{emailError !== true ? <>인증번호를 다시 확인해주세요</> : <>이메일 전송에 실패했습니다</>}</AlertMsg>
         <Btn onClick={onClose}>확인</Btn>
       </Card>
     </Overlay>
