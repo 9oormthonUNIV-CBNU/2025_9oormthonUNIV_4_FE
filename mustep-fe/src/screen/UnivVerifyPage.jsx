@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import styled from "styled-components";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import styled from "styled-components";
 import AuthAlertModal from "../components/auth/AuthAlertModal";
 import Logo from "../assets/logo.png";
@@ -106,7 +106,7 @@ const AuthBtn = styled.button`
 const MailCheckLabel = styled.div`
   flex: 1;
   text-align: right;
-  justify-content: end;
+  /* justify-content: end; */
   margin: 0px 0px;
   font-size: 14px;
   color: ${(props) => props.theme.colors.gray5};
@@ -153,6 +153,66 @@ const UnivVerifyPage = () => {
   const [isSent, setIsSent] = useState(false);
   const [code, setCode] = useState("");
   const [showError, setShowError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+
+  const navigate = useNavigate();
+
+  // 1. 마운트 시: 내 정보 가져오기 → univ 기본값 세팅 → 이미 인증돼 있으면 초기화(clear)
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("⚠️ 토큰이 localStorage에 없습니다.");
+          return;
+        }
+
+        const res = await axios.get(
+          `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo/mypage`,
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // 응답 데이터: res.data.data.userInfo
+        const userInfo = res.data.data.userInfo;
+        if (userInfo) {
+          // 1) 대학명 기본값으로 세팅
+          setUniv(userInfo.university || "");
+
+          // 2) 이미 인증된 사용자라면, 자동으로 clear 요청해서 초기화
+          if (userInfo.universityAuthenticated) {
+            try {
+              await axios.post(
+                `${import.meta.env.VITE_SERVER_END_POINT}/api/univcert/clear`,
+                {
+                  univName: userInfo.university,
+                  univEmail: "" /* 이메일은 아직 입력 전이므로 빈 문자열 */,
+                },
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              // 초기화했으므로 isSent는 false로 남겨둡니다.
+              setIsSent(false);
+            } catch (clearErr) {
+              console.error("기존 대학 인증 초기화 실패:", clearErr);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("마이페이지 정보 조회 실패:", err);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const handleSendEmail = async () => {
     // TODO: 이메일 전송 로직
@@ -161,22 +221,57 @@ const UnivVerifyPage = () => {
     }
 
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("⚠️ 토큰이 localStorage에 없습니다.");
+        return;
+      }
+
+      // 이미 한 번 전송된 상태라면, 먼저 /api/univcert/clear 호출
+      if (isSent) {
+        await axios.post(
+          `${import.meta.env.VITE_SERVER_END_POINT}/api/univcert/clear`,
+          {
+            univName: univ,
+            univEmail: email,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        // clear 요청 후에는 다시 isSent = false 상태로
+        setIsSent(false);
+      }
+
       const res = await axios.post(
-        `${import.meta.env.VITE_SERVER_END_POINT}/api/univcert/code`,
+        // 1) URL
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/univcert`,
+        // 2) body로 보낼 데이터
         { univName: univ, univEmail: email },
-        { withCredentials: true }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       // 2xx 응답이 오면 성공
       if (res.status >= 200 && res.status < 300) {
         setIsSent(true);
-        console.log("성공공")
+        window.alert("✅ 인증 메일이 전송되었습니다. 메일함을 확인해주세요.");
+        console.log("성공");
       } else {
         // 비정상 응답은 에러 처리
+        setEmailError(true);
         setShowError(true);
       }
     } catch (error) {
       console.error("학교 인증 요청 실패:", error);
+      setEmailError(true);
       setShowError(true);
     }
   };
@@ -191,6 +286,11 @@ const UnivVerifyPage = () => {
     }
 
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("⚠️ 토큰이 localStorage에 없습니다.");
+        return;
+      }
       await axios.post(
         `${import.meta.env.VITE_SERVER_END_POINT}/api/univcert/code`,
         {
@@ -198,9 +298,15 @@ const UnivVerifyPage = () => {
           univEmail: email,
           code: numCode,
         },
-        { withCredentials: true }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       // 검증 성공 시 다음 단계로
+      window.alert("✅ 인증에 성공하였습니다.");
       navigate("/");
     } catch (error) {
       console.error("코드 검증 실패", error);
@@ -240,7 +346,7 @@ const UnivVerifyPage = () => {
                   disabled={!univ || !email}
                   onClick={handleSendEmail}
                 >
-                  전송
+                  {isSent ? "재전송" : "전송"}
                 </AuthBtn>
               </EmailGroup>
             </FieldRow>
@@ -264,7 +370,7 @@ const UnivVerifyPage = () => {
               <LaterBtn
                 type="button"
                 onClick={() => {
-                  /* */
+                  navigate("/");
                 }}
               >
                 나중에 할래요
@@ -278,7 +384,16 @@ const UnivVerifyPage = () => {
       </PageWrapper>
 
       {/* 오류 모달 */}
-      {showError && <AuthAlertModal onClose={() => setShowError(false)} />}
+      {showError && (
+        <AuthAlertModal
+          onClose={() => {
+            setShowError(false);
+            setEmailError(false);
+          }}
+          emailError={emailError}
+          setEmailError={setEmailError}
+        />
+      )}
     </>
   );
 };

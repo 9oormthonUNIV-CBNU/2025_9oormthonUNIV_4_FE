@@ -112,9 +112,6 @@ const RegisterPage = () => {
   const [userInfo, setUserInfo] = useState("");
   const navigate = useNavigate();
 
-
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -126,22 +123,28 @@ const RegisterPage = () => {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkMrDfL1jdluKhYhszOe_NOrvVfGhv1l5EsdI8-mHkVEo4g4ci1lgI7QTbpNGgmQdgEsfPSOWidY1eusytDJSAWMomCi-6kyOZBf1Pbw4",
     };
     try {
-
-    const res = await axios.post(
-      // 1) URL
-      `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
-      // 2) body로 보낼 데이터
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true, 
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("⚠️ 토큰이 localStorage에 없습니다.");
+        return;
       }
-    );
+
+      const res = await axios.post(
+        // 1) URL
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
+        // 2) body로 보낼 데이터
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log(res.data);
-
+      console.log("✅ 회원 정보 저장 성공:", res.data);
+ 
       navigate("/university");
     } catch (err) {
       console.error(err);
