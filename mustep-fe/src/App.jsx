@@ -22,10 +22,9 @@ import { ThemeProvider } from "styled-components";
 import theme from "./styles/Theme";
 import UnivVerifyPage from "./screen/UnivVerifyPage";
 import axios from "axios";
+import RequireAuth from "../utils/RequireAuth";
 
 const App = () => {
-
-
   return (
     <>
       <GlobalStyle />
@@ -41,23 +40,65 @@ const App = () => {
               <Route path=":projectId">
                 <Route index element={<ProjectDetail />} />
                 <Route path="teams" element={<ProjectTeamList />} />
-                <Route path="newteam" element={<NewTeam />} />
+                <Route
+                  path="newteam"
+                  element={
+                    <RequireAuth>
+                      <NewTeam />
+                    </RequireAuth>
+                  }
+                />
               </Route>
             </Route>
 
             {/* 팀 관련 페이지 라우팅 */}
             <Route path="teams">
               <Route path=":teamId">
-                <Route index element={<TeamDetail />} />
-                <Route path="apply" element={<TeamApplyForm />} />
-                <Route path="newnotice" element={<NewNoticeForm />} />
-                <Route path="edit" element={<TeamEditForm />} />
+                <Route
+                  index
+                  element={
+                    <RequireAuth>
+                      <TeamDetail />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="apply"
+                  element={
+                    <RequireAuth>
+                      <TeamApplyForm />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="newnotice"
+                  element={
+                    <RequireAuth>
+                      <NewNoticeForm />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="edit"
+                  element={
+                    <RequireAuth>
+                      <TeamEditForm />
+                    </RequireAuth>
+                  }
+                />
               </Route>
             </Route>
 
             {/* 프로필 관련 페이지 라우팅 */}
             <Route path="profile">
-              <Route path=":uid" element={<MyPage />} />
+              <Route
+                path=":uid"
+                element={
+                  <RequireAuth>
+                    <MyPage />
+                  </RequireAuth>
+                }
+              />
             </Route>
           </Route>
 
