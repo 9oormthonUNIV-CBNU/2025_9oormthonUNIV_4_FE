@@ -1,4 +1,5 @@
-// components/team/MemberCard.jsx
+// src/components/team/MemberCard.jsx
+
 import React from "react";
 import styled from "styled-components";
 import CalendarIcon from "../../assets/calendar.svg";
@@ -12,15 +13,18 @@ const MemberHeader = styled.div`
   padding: 0 14px;
   margin-bottom: 0px;
 `;
+
 const ControlBtnBlock = styled.div`
   display: flex;
   gap: 10px;
 `;
+
 const MemberList = styled.div`
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
 `;
+
 const MemberCardContainer = styled.div`
   background: ${({ theme }) => theme.colors.white};
   border-radius: 12px;
@@ -31,6 +35,7 @@ const MemberCardContainer = styled.div`
   align-items: start;
   gap: 8px;
 `;
+
 const MemberCardHeader = styled.div`
   display: flex;
   align-items: center;
@@ -38,18 +43,22 @@ const MemberCardHeader = styled.div`
   gap: 12px;
 `;
 
+// ★ 프로필 이미지를 img prop으로 받아서 background-image에 적용
 const ProfileImg = styled.div`
   width: 30px;
   height: 30px;
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.gray2};
-  background-image: url((img));
+  background-image: ${({ img }) => (img ? `url(${img})` : "none")};
+  background-size: cover;
+  background-position: center;
 `;
 
 const MemberName = styled.div`
   font-size: 1rem;
   color: #1f2533;
 `;
+
 const MemberRole = styled.div`
   font-size: 0.85rem;
   font-weight: bold;
@@ -61,6 +70,7 @@ const JoinDate = styled.div`
   font-weight: bold;
   color: ${({ theme }) => theme.colors.gray4};
 `;
+
 const MemberCard = ({
   isLeader,
   members,
@@ -76,7 +86,7 @@ const MemberCard = ({
     <>
       <MemberHeader>
         <h2>팀원 목록</h2>
-        {/* 아래는 팀장 권한이 있을 시 활성화 */}
+        {/* 팀장 권한이 있을 시 버튼 활성화 */}
         <ControlBtnBlock>
           {isLeader && (
             <>
@@ -102,25 +112,35 @@ const MemberCard = ({
       </MemberHeader>
 
       <MemberList>
-        {/* 예시: 나중에 members.map */}
-        {members.map((m) => (
-          <MemberCardContainer key={m.userId}>
-            <MemberCardHeader>
-              <ProfileImg img={m.imgUrl} />
-              <MemberName>{m.username}</MemberName>
-            </MemberCardHeader>
-            <TextRow>
-              <UserIcon width={15} height={15} />
-              <MemberRole>{m.leader === true ? `팀장` : "팀원"}</MemberRole>
-            </TextRow>
-            <TextRow>
-              <CalendarIcon width={15} />
-              <JoinDate>
-                {m.joinedDaysAgo === 0 ? `오늘` : `${m.joinedDaysAgo}일전 가입`}
-              </JoinDate>
-            </TextRow>
-          </MemberCardContainer>
-        ))}
+        {/*
+          kickedAt이 null인 멤버만 필터링하여 렌더링
+        */}
+        {members
+          .filter((m) => m.kickedAt === null)
+          .map((m) => (
+            <MemberCardContainer key={m.userId}>
+              <MemberCardHeader>
+                <ProfileImg img={m.imgUrl} />
+                <MemberName>{m.username}</MemberName>
+              </MemberCardHeader>
+
+              <TextRow>
+                <UserIcon width={15} height={15} />
+                <MemberRole>
+                  {m.leader ? "팀장" : "팀원"}
+                </MemberRole>
+              </TextRow>
+
+              <TextRow>
+                <CalendarIcon width={15} />
+                <JoinDate>
+                  {m.joinedDaysAgo === 0
+                    ? "오늘"
+                    : `${m.joinedDaysAgo}일전 가입`}
+                </JoinDate>
+              </TextRow>
+            </MemberCardContainer>
+          ))}
       </MemberList>
     </>
   );

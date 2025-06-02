@@ -17,14 +17,22 @@ const Overlay = styled.div`
 `;
 
 const Card = styled.div`
+  position: relative;
   background: #fff;
   border-radius: 24px;
-  padding: 40px 40px;
+  padding: 32px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 380px;
-  width: 100%;
+  width: 503px;
+  height: 467px;
+`;
+
+const Title = styled.h2`
+  font-size: 26px;
+  font-weight: 600;
+  text-align: center;
+  margin: 40px 0 24px 0;
 `;
 
 const AlertMsg = styled.div`
@@ -87,6 +95,43 @@ const CloseBtn = styled(CloseIcon)`
   cursor: pointer;
 `;
 
+const Subtitle = styled.p`
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 16px;
+  align-self: flex-start;
+  text-align: left;
+  margin-left: 50px;
+`;
+
+const DescriptionBox = styled.div`
+  background: #F0F3F5;
+  padding: 16px 16px;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.8;
+  margin-bottom: 40px;
+  font-weight: 400;
+  width: 383px;
+  height: 148px;
+  border-radius: 16px;
+`;
+
+const Btn = styled.button`
+  width: 183px;
+  height: 62px;
+  padding: 14px 0;
+  background: ${({ theme }) => theme.colors.primary};
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
 const Label = styled.label`
   font-weight: 500;
 `;
@@ -145,7 +190,7 @@ const EditIntroduce = ({ initialIntroduce, setShowModal, onUpdateIntroduce }) =>
         >
           <CloseBtn />
         </span>
-        <AlertMsg>자기소개 수정하기</AlertMsg>
+        <Title>자기소개 수정하기</Title>
 
         <InputBlock>
           <Label>자기소개</Label>
