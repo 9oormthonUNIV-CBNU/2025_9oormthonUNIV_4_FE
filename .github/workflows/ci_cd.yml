@@ -23,7 +23,8 @@ jobs:
       working-directory: mustep-fe
 
     - name: Create .env file
-      run: echo "${{ secrets.ENV_FILE }}" > .env
+      run: |
+        echo "${{ secrets.ENV_FILE }}" > .env
       working-directory: mustep-fe
 
     - name: Build Vite project
@@ -31,7 +32,7 @@ jobs:
       working-directory: mustep-fe
 
     - name: Docker build
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/9roomthon-4-team-fe:latest -f ../Dockerfile .
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/9roomthon-4-team-fe:latest .
       working-directory: mustep-fe
 
     - name: Docker Hub login
