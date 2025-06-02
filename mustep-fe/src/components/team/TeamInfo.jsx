@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { IoMdArrowDropdown } from "react-icons/io";
 import RecruitIcon from "../../assets/RecruitIcon.svg";
 import { LuDownload } from "react-icons/lu";
+import axios from "axios";
 
 const Wrapper = styled.div`
   flex: 1;
@@ -92,7 +93,38 @@ const TeamInfo = ({
   maxUserCount,
   memberCount,
   leaderName,
+  teamId
 }) => {
+    const handleStatusChange = async (e) => {
+    const newStatus = e.target.value;
+    const confirmed = window.confirm("정말 모집 상태를 변경하시겠습니까?");
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("로그인 정보가 없습니다. 다시 로그인해주세요.");
+        return;
+      }
+      await axios.put(
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/teams/${teamId}/status`,
+        { status: newStatus },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setStatus(newStatus);
+    } catch (err) {
+      console.error("모집 상태 변경 실패:", err);
+      alert("상태 변경에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  };
+
   return (
     <Wrapper>
       <TeamName>{title}</TeamName>
@@ -112,11 +144,10 @@ const TeamInfo = ({
           <SelectWrapper>
             <StatusSelect
               value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              onChange={handleStatusChange}
             >
               <option value="RECRUITING">모집중</option>
-              <option value="CLOSED">모집마감</option>
-              <option value="PAUSED">모집중단</option>
+              <option value="TERMINAL">모집마감</option>
             </StatusSelect>
             <ArrowIcon size={20} />
           </SelectWrapper>
@@ -124,9 +155,7 @@ const TeamInfo = ({
           <strong>
             {status === "RECRUITING"
               ? "모집중"
-              : status === "CLOSED"
-              ? "모집마감"
-              : "모집중단"}
+              : "모집마감"}
           </strong>
         )}
       </TextRow>

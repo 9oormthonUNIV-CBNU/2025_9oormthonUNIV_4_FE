@@ -525,11 +525,8 @@ const ProfilePage = () => {
                   case "RECRUITING":
                     statusLabel = "모집 중";
                     break;
-                  case "IN_PROGRESS":
-                    statusLabel = "진행 중";
-                    break;
-                  case "FINISHED":
-                    statusLabel = "완료됨";
+                  case "TERMINAL":
+                    statusLabel = "모집 마감";
                     break;
                   default:
                     statusLabel = team.status;
