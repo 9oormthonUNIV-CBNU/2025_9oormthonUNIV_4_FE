@@ -13,42 +13,56 @@ const Wrap = styled.div`
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px;
+    padding: 4px 8px;
     border-radius: 4px;
 
     &.active {
       color: ${({ theme }) => theme.colors.black};
       font-weight: bold;
     }
-    &:hover {
+    &:hover:not(:disabled) {
       background: ${({ theme }) => theme.colors.gray1};
+    }
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
     }
   }
 `;
 
-const Pagination = ({ page = 1, total = 2, onChange }) => {
+
+const Pagination = ({ page = 1, total = 1, onChange }) => {
+  // 총 페이지 수가 유효하지 않으면 아무것도 렌더링하지 않습니다.
   const pageCount = Number.isInteger(total) && total > 0 ? total : 0;
   if (pageCount <= 0) {
-    return <div></div>;
+    return null;
   }
+
+  // “이전” 버튼은 page가 0일 때 비활성화
+  // “다음” 버튼은 page가 마지막 인덱스(total-1)일 때 비활성화
+  const isFirst = page <= 1;
+  const isLast = page >= pageCount;
+
   return (
     <Wrap>
-      <button onClick={() => onChange(page - 1)} disabled={page <= 1}>
+      {/* 이전 */}
+      <button onClick={() => onChange(page - 1)} disabled={isFirst}>
         &lt;
       </button>
-      {/* total이 1 이상일 때만 페이지 버튼을 생성 */}
-      {pageCount > 0 &&
-        [...Array(pageCount)].map((_, i) => (
-          <button
-            key={i}
-            className={page === i + 1 ? "active" : ""}
-            onClick={() => onChange(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
 
-      <button onClick={() => onChange(page + 1)} disabled={page >= total}>
+      {/* 0-based 내부 인덱스지만 UI에는 1-based로 표시 */}
+      {Array.from({ length: pageCount }).map((_, i) => (
+        <button
+          key={i}
+          className={page === i + 1 ? "active" : ""}
+          onClick={() => onChange(i+1)}
+        >
+          {i + 1}
+        </button>
+      ))}
+
+      {/* 다음 */}
+      <button onClick={() => onChange(page + 1)} disabled={isLast}>
         &gt;
       </button>
     </Wrap>

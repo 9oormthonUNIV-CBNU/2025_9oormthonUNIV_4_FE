@@ -210,6 +210,26 @@ const ManageBtn = styled.button`
   }
 `;
 
+const JoinButtonWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+
+  & > button {
+    padding: 12px 32px;
+    background: ${({ theme }) => theme.colors.primary};
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    &:hover {
+      background: ${({ theme }) => theme.colors.primary_lite};
+    }
+  }
+`;
+
 const TeamDetail = () => {
   const navigate = useNavigate();
   const { teamId } = useParams();
@@ -225,6 +245,10 @@ const TeamDetail = () => {
   const [notices, setNotices] = useState([]);
   const [noticeTotalPages, setNoticeTotalPages] = useState(1);
 
+  const [collabPage, setCollabPage] = useState(1);
+  const [collaboLinks, setCollaboLinks] = useState([]); // 서버에서 받아올 “현재 페이지” 링크 배열
+  const [collabTotalPages, setCollabTotalPages] = useState(1); // 서버가 알려주는 총 페이지 개수
+
   const [showTeamManageModal, setShowTeamManageModal] = useState(false);
   const [showApplyManageModal, setShowApplyManageModal] = useState(false);
   const [showCollaboModal, setCollaboModal] = useState(false);
@@ -232,7 +256,6 @@ const TeamDetail = () => {
 
   const [collaboes, setCollaboes] = useState(CollaboDummyData);
 
-  // TODO: useEffect 로 API에서 team 데이터, members 불러오기
   useEffect(() => {
     if (!teamId) return;
 
@@ -261,9 +284,6 @@ const TeamDetail = () => {
           // 받은 데이터를 state에 세팅
           setTeamDetail(data);
           setMembers(data.members || []);
-          // setNotices(data.notifies || []);
-          // 임시로 collaboes는 더미 데이터 사용 중이라면, API 스펙이 나오면 바꿔주세요
-          // setCollaboes(data.collaboes || []);
           setStatus(data.status);
           setLeaderName(() => {
             const leaderObj = data.members.find((m) => m.leader === true);
@@ -320,8 +340,37 @@ const TeamDetail = () => {
     fetchNotices();
   }, [teamId, noticePage]);
 
+  useEffect(() => {
+    if (!teamId) return;
+    const fetchCollaboLinks = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_SERVER_END_POINT
+          }/api/v1/tool-links?page=${collabPage}`,
+          {
+            headers: {
+              accept: "*/*",
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
+        if (res.data && res.data.data) {
+          const { content, totalPages } = res.data.data;
+          setCollaboLinks(content);
+          setCollabTotalPages(totalPages);
+        }
+      } catch (err) {
+        console.error("협업 링크 조회 실패:", err);
+      }
+    };
+    fetchCollaboLinks();
+  }, [teamId, collabPage]);
+
   if (!teamDetail) {
-    return <div style={{ padding: "24px" }}>로딩 중...</div>;
+    return <PageWrapper>로딩 중...</PageWrapper>;
   }
 
   return (
@@ -347,45 +396,57 @@ const TeamDetail = () => {
         </TopSection>
         <Divider />
         <TeamIntroduce>
-          <ManageBtn $variant="mode">공개 보기 모드 수정하기</ManageBtn>
+          {isLeader ? (
+            <ManageBtn $variant="mode">공개 보기 모드 수정하기</ManageBtn>
+          ) : null}
           <p>한줄소개</p>
           <h1>“{(teamDetail && teamDetail.content) || ""}”</h1>
+          {!isLeader && (
+            <JoinButtonWrapper>
+              <button onClick={() => navigate(`/teams/${teamId}/apply`)}>
+                가입 신청하러 가기
+              </button>
+            </JoinButtonWrapper>
+          )}
         </TeamIntroduce>
 
         {/* 공지사항 & 협업링크 */}
-        <CollaboSection>
-          {/* 공지사항 카드 */}
-          <CardContainer>
-            <NoticeCard
-              notices={notices}
-              ManageBtn={ManageBtn}
-              CardHeader={CardHeader}
-              page={noticePage}
-              totalPages={noticeTotalPages}
-              onChangePage={(newPage) => setNoticePage(newPage)}
-            />
-          </CardContainer>
+        {isLeader ? (
+          <CollaboSection>
+            {/* 공지사항 카드 */}
+            <CardContainer>
+              <NoticeCard
+                notices={notices}
+                ManageBtn={ManageBtn}
+                CardHeader={CardHeader}
+                page={noticePage}
+                totalPages={noticeTotalPages}
+                onChangePage={(newPage) => setNoticePage(newPage)}
+              />
+            </CardContainer>
 
-          {/* 협업 관련 링크 카드 */}
-          <CardContainer>
-            <CollaboLinkCard
-              CardHeader={CardHeader}
-              ManageBtn={ManageBtn}
-              collaboes={collaboes}
-              setCollaboModal={setCollaboModal}
-              setShowModal={setCollaboModal}
-            />
-            <Pagination
-              page={currentPage}
-              total={4}
-              onChange={(newPage) => setCurrentPage(newPage)}
-            />
-          </CardContainer>
-        </CollaboSection>
+            {/* 협업 관련 링크 카드 */}
+            <CardContainer>
+              <CollaboLinkCard
+                CardHeader={CardHeader}
+                ManageBtn={ManageBtn}
+                collaboes={collaboLinks}
+                setCollaboes={setCollaboLinks}
+                setShowModal={setCollaboModal}
+              />
+              <Pagination
+                page={collabPage}
+                total={collabTotalPages}
+                onChange={(newPage) => setCollabPage(newPage)}
+              />
+            </CardContainer>
+          </CollaboSection>
+        ) : null}
 
         {/* 팀원 목록 */}
         <MemberSection>
           <MemberCard
+            isLeader={isLeader}
             members={teamDetail.members}
             TextRow={TextRow}
             ManageBtn={ManageBtn}
@@ -394,16 +455,18 @@ const TeamDetail = () => {
           />
         </MemberSection>
 
-        <ActionSection>
-          <EndProjectBtn>프로젝트 끝내기</EndProjectBtn>
-          <SubmitFinalBtn onClick={() => setShowDocsModal(true)}>
-            최종 산출물 제출하기
-          </SubmitFinalBtn>
-        </ActionSection>
+        {isLeader && (
+          <ActionSection>
+            <EndProjectBtn>프로젝트 끝내기</EndProjectBtn>
+            <SubmitFinalBtn onClick={() => setShowDocsModal(true)}>
+              최종 산출물 제출하기
+            </SubmitFinalBtn>
+          </ActionSection>
+        )}
       </PageWrapper>
       {showTeamManageModal && (
         <TeamManageModal
-          teamId={teamId} 
+          teamId={teamId}
           members={teamDetail.members}
           setMembers={setMembers}
           setShowModal={setShowTeamManageModal}

@@ -44,7 +44,6 @@ const ProfileImg = styled.div`
   border-radius: 50%;
   background: ${({ theme }) => theme.colors.gray2};
   background-image: url((img));
-  
 `;
 
 const MemberName = styled.div`
@@ -62,9 +61,16 @@ const JoinDate = styled.div`
   font-weight: bold;
   color: ${({ theme }) => theme.colors.gray4};
 `;
-const MemberCard = ({ members, TextRow, ManageBtn, setShowModal, setShowApplyModal }) => {
+const MemberCard = ({
+  isLeader,
+  members,
+  TextRow,
+  ManageBtn,
+  setShowModal,
+  setShowApplyModal,
+}) => {
   const navigate = useNavigate();
-    const { pathname } = useLocation();
+  const { pathname } = useLocation();
 
   return (
     <>
@@ -72,8 +78,26 @@ const MemberCard = ({ members, TextRow, ManageBtn, setShowModal, setShowApplyMod
         <h2>팀원 목록</h2>
         {/* 아래는 팀장 권한이 있을 시 활성화 */}
         <ControlBtnBlock>
-          <ManageBtn $variant="control" onClick={() => {setShowModal(true);}}>팀원관리</ManageBtn>
-          <ManageBtn $variant="control" onClick={() => {setShowApplyModal(true);}}>팀 신청자 보기</ManageBtn>
+          {isLeader && (
+            <>
+              <ManageBtn
+                $variant="control"
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                팀원관리
+              </ManageBtn>
+              <ManageBtn
+                $variant="control"
+                onClick={() => {
+                  setShowApplyModal(true);
+                }}
+              >
+                팀 신청자 보기
+              </ManageBtn>
+            </>
+          )}
         </ControlBtnBlock>
       </MemberHeader>
 
@@ -82,7 +106,7 @@ const MemberCard = ({ members, TextRow, ManageBtn, setShowModal, setShowApplyMod
         {members.map((m) => (
           <MemberCardContainer key={m.userId}>
             <MemberCardHeader>
-              <ProfileImg img={m.imgUrl}/>
+              <ProfileImg img={m.imgUrl} />
               <MemberName>{m.username}</MemberName>
             </MemberCardHeader>
             <TextRow>
@@ -91,7 +115,9 @@ const MemberCard = ({ members, TextRow, ManageBtn, setShowModal, setShowApplyMod
             </TextRow>
             <TextRow>
               <CalendarIcon width={15} />
-              <JoinDate>{m.joinedDaysAgo === 0 ? `오늘` : `${m.joinedDaysAgo}일전 가입`}</JoinDate>
+              <JoinDate>
+                {m.joinedDaysAgo === 0 ? `오늘` : `${m.joinedDaysAgo}일전 가입`}
+              </JoinDate>
             </TextRow>
           </MemberCardContainer>
         ))}

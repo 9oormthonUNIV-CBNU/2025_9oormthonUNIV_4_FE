@@ -1,5 +1,5 @@
 // src/screen/team/TeamApplyForm.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router";
 import ArrowForward from "../../assets/arrow_forward.svg";
@@ -127,13 +127,45 @@ const StyledMarkdownEditor = styled(MarkdownEditor)`
   border-radius: 8px;
 `;
 
-const NewNoticeForm = () => {
+const EditNotice = () => {
   const navigate = useNavigate();
-  const { teamId } = useParams();
+  const { teamId, notifyId } = useParams();
 
   const [title, setTitle] = useState("");
   const [contents, setContents] = useState("");
 
+  useEffect(() => {
+    const fetchNotice = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          alert("로그인이 필요합니다.");
+          navigate("/login");
+          return;
+        }
+
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_SERVER_END_POINT
+          }/api/teams/${teamId}/notifies/${notifyId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
+
+        const data = res.data.data;
+
+        setTitle(data.title);
+        setContents(data.content);
+      } catch (err) {
+      console.error("공지사항 조회회 실패:", err);
+      }
+    };
+    fetchNotice();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -151,10 +183,10 @@ const NewNoticeForm = () => {
         content: contents,
       };
 
-      await axios.post(
+      await axios.put(
         `${
           import.meta.env.VITE_SERVER_END_POINT
-        }/api/teams/${teamId}/notifies`,
+        }/api/teams/${teamId}/notifies/${notifyId}`,
         body,
         {
           headers: {
@@ -164,11 +196,11 @@ const NewNoticeForm = () => {
         }
       );
 
-      alert("공지사항이 등록되었습니다.");
+      alert("공지사항이 수정되었습니다.");
       navigate(-1);
     } catch (err) {
-      console.error("공지사항 등록 실패:", err);
-      alert("공지사항 등록 중 오류가 발생했습니다.");
+      console.error("공지사항 수정 실패:", err);
+      alert("공지사항 수정 중 오류가 발생했습니다.");
     }
   };
 
@@ -178,7 +210,7 @@ const NewNoticeForm = () => {
         <ArrowForward />
       </HeaderRow>
       <div>
-        <Title>공지사항 글쓰기</Title>
+        <Title>공지사항 수정</Title>
       </div>
 
       <Form onSubmit={handleSubmit}>
@@ -203,9 +235,7 @@ const NewNoticeForm = () => {
               contents={contents}
               setContents={setContents}
             />
-            <CharCount>
-              {contents.length}
-            </CharCount>
+            <CharCount>{contents.length}</CharCount>
           </TextareaWrapper>
         </RowGroup>
 
@@ -220,4 +250,4 @@ const NewNoticeForm = () => {
   );
 };
 
-export default NewNoticeForm;
+export default EditNotice;
