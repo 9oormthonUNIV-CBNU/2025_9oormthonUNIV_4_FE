@@ -1,5 +1,5 @@
 // src/screen/ProfilePage.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import styled from "styled-components";
@@ -64,6 +64,7 @@ const AvatarWrapper = styled.div`
   overflow: hidden;
   background: #f0f0f0;
   flex-shrink: 0;
+  cursor: pointer;
 
   img {
     width: 100%;
@@ -253,6 +254,9 @@ const ProfilePage = () => {
 
   const [showEditModal, setShowEditModal] = useState(false);
 
+  // 프로필 사진 업로드용 파일 인풋(ref)
+  const fileInputRef = useRef(null);
+
   useEffect(() => {
     const fetchMyPage = async () => {
       try {
@@ -349,6 +353,84 @@ const ProfilePage = () => {
     }));
   };
 
+  const onAvatarClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // 사용자가 파일을 선택하면 호출되는 함수
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      // 1) S3 업로드: multipart/form-data
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const uploadRes = await axios.post(
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/s3/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+
+      if (
+        !uploadRes.data ||
+        uploadRes.data.success !== true ||
+        !uploadRes.data.data
+      ) {
+        throw new Error("S3 업로드에 실패했습니다.");
+      }
+
+      const newImgUrl = uploadRes.data.data; // S3에서 반환된 URL
+
+      // 2) 유저 정보 PUT 요청: 기존 정보는 그대로 두고 imgUrl만 교체
+      await axios.put(
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
+        {
+          // 반드시 서버가 필요로 하는 모든 필드를 포함해야 함. (예시에서는 nickname,major,university,introduce,imgUrl)
+          nickname: userInfo.nickname,
+          major: userInfo.major,
+          university: userInfo.university,
+          introduce: userInfo.introduce,
+          imgUrl: newImgUrl,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+
+      // 3) 로컬 상태 갱신 → UI에 즉시 반영
+      setUserInfo((prev) => ({
+        ...prev,
+        imgUrl: newImgUrl,
+      }));
+
+      alert("✅ 프로필 사진 변경에 성공하였습니다.");
+    } catch (err) {
+      console.error("프로필 사진 업로드/저장 오류:", err);
+      alert("프로필 사진을 업로드하는 중 오류가 발생했습니다.");
+    } finally {
+      // 파일 인풋 값 초기화(선택창을 다시 띄우기 위해)
+      e.target.value = "";
+    }
+  };
+
   return (
     <>
       <PageWrapper>
@@ -359,13 +441,20 @@ const ProfilePage = () => {
         <Title>마이 페이지</Title>
         {/* 2) 프로필 카드 */}
         <ProfileCard>
-          <AvatarWrapper>
+          <AvatarWrapper onClick={onAvatarClick}>
             {imgUrl ? (
               <img src={imgUrl} alt="프로필" />
             ) : (
               <img src={UserIcon} alt="기본 프로필" />
             )}
           </AvatarWrapper>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
 
           <InfoWrapper>
             {/* 인사말: “안녕하세요, 닉네임 님” */}
@@ -467,7 +556,13 @@ const ProfilePage = () => {
           )}
         </MyProjectsWrapper>
       </PageWrapper>
-      {showEditModal && <EditIntroduce initialIntroduce={introduce} setShowModal={setShowEditModal} onUpdateIntroduce={handleUpdateIntroduce} />}
+      {showEditModal && (
+        <EditIntroduce
+          initialIntroduce={introduce}
+          setShowModal={setShowEditModal}
+          onUpdateIntroduce={handleUpdateIntroduce}
+        />
+      )}
     </>
   );
 };
