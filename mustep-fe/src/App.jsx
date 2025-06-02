@@ -33,7 +33,7 @@ const App = () => {
       <GlobalStyle />
       <BrowserRouter>
         <Routes>
-          {/* 기본 라우팅 홈페이지로 리다이렉트 */}
+          {/* 기 본 라우팅 홈페이지로 리다이렉트 */}
           <Route path="/" element={<Root />}>
             <Route index element={<MainPage />} />
 
