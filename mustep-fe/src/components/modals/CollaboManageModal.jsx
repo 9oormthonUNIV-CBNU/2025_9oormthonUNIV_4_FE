@@ -188,13 +188,6 @@ const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal }) => {
     );
   };
 
-  const handleRemove = () => {
-    // 선택된 것만 필터링 해제
-    setCollaboes(collaboes.filter((item) => !selectedIds.includes(item.id)));
-    setSelectedIds([]);
-    setShowModal(false);
-  };
-
   // 1) 현재 링크 목록을 서버에서 받아오기
   const fetchCollaboLinks = async () => {
     try {
@@ -221,6 +214,45 @@ const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal }) => {
   useEffect(() => {
     fetchCollaboLinks();
   }, [teamId]);
+
+  const handleRemove = async () => {
+    if (selectedIds.length === 0) return;
+
+    // 1) 사용자에게 확인
+    const ok = window.confirm(
+      `정말 선택된 ${selectedIds.length}개의 링크를 삭제하시겠습니까?`
+    );
+    if (!ok) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      // 2) DELETE 요청: 서버 예시대로 body에 { ids: [ ... ] } JSON 전송
+      await axios.delete(
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/${teamId}`,
+        {
+          headers: {
+            accept: "*/*",
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          data: {
+            ids: selectedIds,
+          },
+        }
+      );
+
+      // 3) 삭제 성공 후: 로컬 상태 갱신 혹은 다시 목록 호출
+      //    여기서는 다시 fetchCollaboLinks를 호출해서 최신 목록을 가져옵니다.
+      setSelectedIds([]); // 선택 초기화
+      fetchCollaboLinks();
+    } catch (err) {
+      console.error("링크 삭제 실패:", err);
+      alert("링크 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
 
   return (
     <>

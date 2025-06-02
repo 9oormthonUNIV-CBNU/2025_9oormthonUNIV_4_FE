@@ -241,11 +241,11 @@ const TeamDetail = () => {
   const [status, setStatus] = useState("recruiting");
 
   // 공지사항 관련 state
-  const [noticePage, setNoticePage] = useState(0);
+  const [noticePage, setNoticePage] = useState(1);
   const [notices, setNotices] = useState([]);
   const [noticeTotalPages, setNoticeTotalPages] = useState(1);
 
-  const [collabPage, setCollabPage] = useState(0);
+  const [collabPage, setCollabPage] = useState(1);
   const [collaboLinks, setCollaboLinks] = useState([]); // 서버에서 받아올 “현재 페이지” 링크 배열
   const [collabTotalPages, setCollabTotalPages] = useState(1); // 서버가 알려주는 총 페이지 개수
 
