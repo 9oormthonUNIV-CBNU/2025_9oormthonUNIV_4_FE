@@ -4,7 +4,6 @@ import React from "react";
 import styled from "styled-components";
 import CalendarIcon from "../../assets/calendar.svg";
 import UserIcon from "../../assets/user_icon.svg";
-import { useNavigate, useLocation } from "react-router";
 
 const MemberHeader = styled.div`
   display: flex;
@@ -34,6 +33,7 @@ const MemberCardContainer = styled.div`
   flex-direction: column;
   align-items: start;
   gap: 8px;
+  cursor: pointer; /* 클릭 가능 커서 */
 `;
 
 const MemberCardHeader = styled.div`
@@ -43,7 +43,7 @@ const MemberCardHeader = styled.div`
   gap: 12px;
 `;
 
-// ★ 프로필 이미지를 img prop으로 받아서 background-image에 적용
+// 프로필 이미지를 img prop으로 받아서 background-image에 적용
 const ProfileImg = styled.div`
   width: 30px;
   height: 30px;
@@ -62,7 +62,8 @@ const MemberName = styled.div`
 const MemberRole = styled.div`
   font-size: 0.85rem;
   font-weight: bold;
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme, leader }) =>
+    leader ? theme.colors.primary : theme.colors.black};
 `;
 
 const JoinDate = styled.div`
@@ -78,31 +79,24 @@ const MemberCard = ({
   ManageBtn,
   setShowModal,
   setShowApplyModal,
+  onClickMember, // 부모로부터 전달된 클릭 콜백
 }) => {
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-
   return (
     <>
       <MemberHeader>
         <h2>팀원 목록</h2>
-        {/* 팀장 권한이 있을 시 버튼 활성화 */}
         <ControlBtnBlock>
           {isLeader && (
             <>
               <ManageBtn
                 $variant="control"
-                onClick={() => {
-                  setShowModal(true);
-                }}
+                onClick={() => setShowModal(true)}
               >
                 팀원관리
               </ManageBtn>
               <ManageBtn
                 $variant="control"
-                onClick={() => {
-                  setShowApplyModal(true);
-                }}
+                onClick={() => setShowApplyModal(true)}
               >
                 팀 신청자 보기
               </ManageBtn>
@@ -112,21 +106,25 @@ const MemberCard = ({
       </MemberHeader>
 
       <MemberList>
-        {/*
-          kickedAt이 null인 멤버만 필터링하여 렌더링
-        */}
         {members
-          .filter((m) => m.kickedAt === null)
+          .filter((m) => m.kickedAt === null) // kickedAt이 null인 멤버만
           .map((m) => (
-            <MemberCardContainer key={m.userId}>
+            <MemberCardContainer
+              key={m.userId}
+              onClick={() => {
+                if (onClickMember) {
+                  onClickMember(m.userId);
+                }
+              }}
+            >
               <MemberCardHeader>
-                <ProfileImg img={m.imgUrl} />
+                <ProfileImg img={m.imgUrl || ""} />
                 <MemberName>{m.username}</MemberName>
               </MemberCardHeader>
 
               <TextRow>
                 <UserIcon width={15} height={15} />
-                <MemberRole>
+                <MemberRole leader={m.leader}>
                   {m.leader ? "팀장" : "팀원"}
                 </MemberRole>
               </TextRow>

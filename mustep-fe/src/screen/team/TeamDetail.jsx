@@ -16,6 +16,7 @@ import CollaboManageModal from "../../components/modals/CollaboManageModal";
 import SubmitDocsModal from "../../components/modals/SubmitDocsModal";
 import axios from "axios";
 import Loading from "../../components/Loading";
+import ProfileModal from "../../components/modals/ProfileModal";
 
 const PageWrapper = styled.main`
   padding: 45px 360px;
@@ -232,6 +233,7 @@ const TeamDetail = () => {
   const [leaderName, setLeaderName] = useState("");
   const [members, setMembers] = useState(DummyTeamMember);
   const [status, setStatus] = useState("recruiting");
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   // 공지사항
   const [noticePage, setNoticePage] = useState(1);
@@ -248,6 +250,7 @@ const TeamDetail = () => {
   const [showApplyManageModal, setShowApplyManageModal] = useState(false);
   const [showCollaboModal, setCollaboModal] = useState(false);
   const [showDocsModal, setShowDocsModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // ──────────────────────────────────────────────────────
   // 1) 로그인된 사용자 정보(userId) 가져오기
@@ -544,6 +547,12 @@ const TeamDetail = () => {
               setShowApplyModal={setShowApplyManageModal}
               // 팀장이 아니면 “팀원 관리” 버튼 비활성화
               ManageBtnDisabled={!isLeader}
+              setShowProfileModal={setShowProfileModal}
+
+              onClickMember={(userId) => {
+                setSelectedUserId(userId);
+                setShowProfileModal(true);
+              }}
             />
           </MemberSection>
         )}
@@ -584,6 +593,12 @@ const TeamDetail = () => {
         />
       )}
       {showDocsModal && <SubmitDocsModal setShowModal={setShowDocsModal} />}
+      {showProfileModal && (
+        <ProfileModal
+          userId={selectedUserId}
+          onClose={() => setShowProfileModal(false)}
+        />
+      )}
     </>
   );
 };
