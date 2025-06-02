@@ -108,6 +108,7 @@ const DetailGroup = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  word-wrap: break-word;
   gap: 4px;
   flex: 1;
 `;
@@ -194,7 +195,7 @@ const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal }) => {
       const token = localStorage.getItem("token");
       if (!token) return;
       const res = await axios.get(
-        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/all`,
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/all/teams/${teamId}`,
         {
           headers: {
             "accept": "*/*",

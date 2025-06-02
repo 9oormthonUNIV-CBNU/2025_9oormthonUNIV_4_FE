@@ -5,6 +5,7 @@ import Pagination from "./Pagination";
 import { getFaviconUrl } from "../../../utils/Utils";
 import { useParams } from "react-router";
 import axios from "axios";
+import NoItem from "../NoItem";
 
 const CollaboLinkList = styled.ul`
   list-style: none;
@@ -28,15 +29,34 @@ const CollaboLinkCard = ({
   CardHeader,
   ManageBtn,
   collaboes = [],
+  setCollaboes,
   setShowModal,
+  ManageBtnDisabled,
 }) => {
+  if (collaboes.length === 0) {
+    return (
+      <>
+        <CardHeader>
+          <h2>협업 관련 링크</h2>
+          {!ManageBtnDisabled && (
+            <ManageBtn $variant="action" onClick={() => setShowModal(true)}>
+              링크 관리
+            </ManageBtn>
+          )}
+        </CardHeader>
+        <NoItem />
+      </>
+    );
+  }
   return (
     <>
       <CardHeader>
         <h2>협업 관련 링크</h2>
-        <ManageBtn $variant="action" onClick={() => setShowModal(true)}>
-          링크 관리
-        </ManageBtn>
+        {!ManageBtnDisabled && (
+          <ManageBtn $variant="action" onClick={() => setShowModal(true)}>
+            링크 관리
+          </ManageBtn>
+        )}
       </CardHeader>
       <CollaboLinkList>
         {collaboes.length === 0 ? (

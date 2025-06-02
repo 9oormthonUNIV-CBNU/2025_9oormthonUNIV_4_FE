@@ -43,30 +43,26 @@ const Pagination = ({ page = 1, total = 1, onChange }) => {
   const isFirst = page <= 1;
   const isLast = page >= pageCount;
 
-  return (
-    <Wrap>
-      {/* 이전 */}
-      <button onClick={() => onChange(page - 1)} disabled={isFirst}>
-        &lt;
+return (
+  <Wrap>
+    <button onClick={() => onChange(page - 1)} disabled={isFirst}>
+      &lt;
+    </button>
+    {Array.from({ length: pageCount }).map((_, i) => (
+      <button
+        key={i}
+        className={page === i + 1 ? "active" : ""}
+        onClick={() => onChange(i + 1)}
+      >
+        {i + 1}
       </button>
+    ))}
+    <button onClick={() => onChange(page + 1)} disabled={isLast}>
+      &gt;
+    </button>
+  </Wrap>
+);
 
-      {/* 0-based 내부 인덱스지만 UI에는 1-based로 표시 */}
-      {Array.from({ length: pageCount }).map((_, i) => (
-        <button
-          key={i}
-          className={page === i + 1 ? "active" : ""}
-          onClick={() => onChange(i+1)}
-        >
-          {i + 1}
-        </button>
-      ))}
-
-      {/* 다음 */}
-      <button onClick={() => onChange(page + 1)} disabled={isLast}>
-        &gt;
-      </button>
-    </Wrap>
-  );
 };
 
 export default Pagination;

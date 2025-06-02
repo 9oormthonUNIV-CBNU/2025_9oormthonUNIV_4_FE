@@ -153,7 +153,7 @@ const AddLink = ({setShowModal, onNewLinkAdded}) => {
 
       // POST /api/v1/tool-links/{teamId}
       await axios.post(
-        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/${teamId}`,
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/teams/${teamId}`,
         {
           toolLink: link.trim(),
         },
@@ -166,9 +166,9 @@ const AddLink = ({setShowModal, onNewLinkAdded}) => {
       );
 
       // 추가 성공 시 콜백 호출 (예: 부모가 링크 목록을 다시 로드)
-      if (onNewLinkAdded) {
-        onNewLinkAdded();
-      }
+      // if (onNewLinkAdded) {
+      //   onNewLinkAdded();
+      // }
 
       // 모달 닫기
       setShowModal(false);

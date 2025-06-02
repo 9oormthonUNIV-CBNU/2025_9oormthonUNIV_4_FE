@@ -79,6 +79,35 @@ const AuthBtn = styled.button`
   cursor: pointer;
 `;
 
+const AuthWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const DropdownMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #dde0e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const DropdownItem = styled.div`
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  &:hover {
+    background-color: #f5f5f5;
+    border-radius: 8px;
+  }
+`;
+
 const UserImg = styled.img`
   width: 20px;
   height: 20px;
@@ -100,6 +129,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const rawToken = localStorage.getItem("token");
@@ -132,6 +162,18 @@ const Navbar = () => {
     fetchUserInfo();
   }, [token]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setMenuOpen(false);
+    navigate("/");
+  };
+
+  const handleMyPage = () => {
+    setMenuOpen(false);
+    navigate("/mypage");
+  };
+
   return (
     <NavbarContainer>
       <Link to="/">
@@ -143,31 +185,35 @@ const Navbar = () => {
       <Link to="/projects">
         <LogoText>기업 프로젝트</LogoText>
       </Link>
-      <NavItemGroup></NavItemGroup>
-      {token && userInfo && (
-        <BtnGroup>
-          {/* AuthBtn 클릭 시, 예를 들어 “/mypage”로 이동하도록 설정 */}
-          <AuthBtn onClick={() => navigate("/mypage")}>
-            {/* userInfo.imgUrl이 반드시 존재한다고 가정하나, 
-                혹시 없을 수 있으니 기본 User 아이콘도 옵션으로 준비 */}
-            {userInfo.imgUrl ? (
-              <UserImg
-                src={userInfo.imgUrl ? userInfo.imgUrl : User}
-                alt="user_icon"
-              />
-            ) : (
-              <User width={20} height={20} />
-            )}
+      <NavItemGroup />
 
-            {userInfo.nickname}
-          </AuthBtn>
+      {token && userInfo ? (
+        <BtnGroup>
+          <AuthWrapper>
+            <AuthBtn onClick={() => setMenuOpen((prev) => !prev)}>
+              {userInfo.imgUrl ? (
+                <UserImg src={userInfo.imgUrl} alt="user_icon" />
+              ) : (
+                <User width={20} height={20} />
+              )}
+              {userInfo.nickname}
+            </AuthBtn>
+            {menuOpen && (
+              <DropdownMenu>
+                <DropdownItem onClick={handleMyPage}>
+                  마이페이지
+                </DropdownItem>
+                <DropdownItem onClick={handleLogout}>
+                  로그아웃
+                </DropdownItem>
+              </DropdownMenu>
+            )}
+          </AuthWrapper>
         </BtnGroup>
-      )}
-      {/* 4) token이 없으면(로그아웃 상태) → 로그인/회원가입 버튼 노출 */}
-      {!token && (
+      ) : (
         <BtnGroup>
           <LoginBtn onClick={() => navigate("/login")}>Login</LoginBtn>
-          <JoinBtn onClick={() => navigate("/signup")}>Join</JoinBtn>
+          <JoinBtn onClick={() => navigate("/projects")}>Join</JoinBtn>
         </BtnGroup>
       )}
     </NavbarContainer>

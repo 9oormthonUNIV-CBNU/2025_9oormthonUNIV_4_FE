@@ -9,6 +9,7 @@ import UserIcon from "../assets/user_icon.svg"; // 기본 아바타 아이콘
 import SchoolIcon from "../assets/school_icon.svg"; // 대학교 아이콘
 import CertIcon from "../assets/cert_icon.svg"; // 인증 완료 아이콘
 import EditIntroduce from "../components/modals/EditIntroduce";
+import NoItem from "../components/NoItem";
 
 // ———— Styled Components ————
 
@@ -504,7 +505,7 @@ const ProfilePage = () => {
         <MyProjectsWrapper>
           <SectionTitle>나의 프로젝트 팀</SectionTitle>
           {myTeams.length === 0 ? (
-            <div>참여 중인 팀이 없습니다.</div>
+            <NoItem />
           ) : (
             <ProjectList>
               {myTeams.map((team) => {
@@ -525,11 +526,8 @@ const ProfilePage = () => {
                   case "RECRUITING":
                     statusLabel = "모집 중";
                     break;
-                  case "IN_PROGRESS":
-                    statusLabel = "진행 중";
-                    break;
-                  case "FINISHED":
-                    statusLabel = "완료됨";
+                  case "TERMINAL":
+                    statusLabel = "모집 마감";
                     break;
                   default:
                     statusLabel = team.status;

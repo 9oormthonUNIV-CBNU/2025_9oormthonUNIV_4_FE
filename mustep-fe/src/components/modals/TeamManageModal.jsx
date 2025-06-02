@@ -43,7 +43,7 @@ const MemberList = styled.ul`
   flex-direction: column;
   gap: 16px;
   margin-bottom: 32px;
-`;  
+`;
 
 const MemberItem = styled.li`
   display: flex;
@@ -76,7 +76,7 @@ const DetailGroup = styled.div`
   width: 30%;
   margin-left: 24px;
   gap: 4px;
-  
+
   & > div {
     display: flex;
     align-items: center;
@@ -136,8 +136,6 @@ const CloseBtn = styled(CloseIcon)`
   cursor: pointer;
 `;
 
-
-
 const TeamManageModal = ({ teamId, members, setMembers, setShowModal }) => {
   const [showAlert, setShowAlert] = useState(false);
 
@@ -160,9 +158,6 @@ const TeamManageModal = ({ teamId, members, setMembers, setShowModal }) => {
     );
   };
 
-
-
-
   const handleSave = async () => {
     // removed === true인 멤버 목록 중에서 팀장(true) 아닌 것만 골라서 DELETE 요청
     const toRemove = members.filter((m) => m.removed && !m.leader);
@@ -178,7 +173,9 @@ const TeamManageModal = ({ teamId, members, setMembers, setShowModal }) => {
       await Promise.all(
         toRemove.map((m) =>
           axios.delete(
-            `${import.meta.env.VITE_SERVER_END_POINT}/api/members/${teamId}/members/${m.userId}`,
+            `${
+              import.meta.env.VITE_SERVER_END_POINT
+            }/api/members/${teamId}/members/${m.userId}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -189,13 +186,33 @@ const TeamManageModal = ({ teamId, members, setMembers, setShowModal }) => {
         )
       );
 
-      console.log("삭제 완료된 멤버 ID들:", toRemove.map((m) => m.userId));
+      console.log(
+        "삭제 완료된 멤버 ID들:",
+        toRemove.map((m) => m.userId)
+      );
       // 모달 닫기
       setShowModal(false);
     } catch (err) {
       console.error("멤버 삭제 실패", err);
     }
   };
+
+  if (members.length === 0) {
+    return (
+      <Overlay>
+        <Card>
+          <span
+            style={{ alignSelf: "self-end" }}
+            onClick={() => setShowModal(false)}
+          >
+            <CloseBtn />
+          </span>
+          <Title>팀 관리하기</Title>
+          <NoItem />
+        </Card>
+      </Overlay>
+    );
+  }
 
   return (
     <>
@@ -209,33 +226,38 @@ const TeamManageModal = ({ teamId, members, setMembers, setShowModal }) => {
           </span>
           <Title>팀 관리하기</Title>
           <MemberList>
-            {members.filter((m) => !m.leader).map((m) => (
-              <MemberItem key={m.id} removed={m.removed}>
-                <InfoGroup>
-                  <UserProfile src={m.imgUrl} />
-                  <NameText>{m.username}</NameText>
-                </InfoGroup>
-                <DetailGroup>
-                  <div>
-                    <UserIcon width={15} height={15}/>
-                    <span style={{color: "black", fontWeight: "bold"}}>팀원</span>
-                  </div>
-                  <div>
-                    <CalendarIcon width={15} height={15} />
-                    <span>{(m.joinedDaysAgo)}일전 가입</span>
-                  </div>
-                </DetailGroup>
-                {m.removed ? (
-                  <RemovedText>
-                    {formatTimeAgo(m.removedAt)} “내보내기” 되었습니다
-                  </RemovedText>
-                ) : (
-                  <RemoveBtn onClick={() => handleRemove(m.id)}>
-                    내보내기
-                  </RemoveBtn>
-                )}
-              </MemberItem>
-            ))}
+            {members.length !== 0 &&
+              members
+                .filter((m) => !m.leader)
+                .map((m) => (
+                  <MemberItem key={m.id} removed={m.removed}>
+                    <InfoGroup>
+                      <UserProfile src={m.imgUrl} />
+                      <NameText>{m.username}</NameText>
+                    </InfoGroup>
+                    <DetailGroup>
+                      <div>
+                        <UserIcon width={15} height={15} />
+                        <span style={{ color: "black", fontWeight: "bold" }}>
+                          팀원
+                        </span>
+                      </div>
+                      <div>
+                        <CalendarIcon width={15} height={15} />
+                        <span>{m.joinedDaysAgo}일전 가입</span>
+                      </div>
+                    </DetailGroup>
+                    {m.removed ? (
+                      <RemovedText>
+                        {formatTimeAgo(m.removedAt)} “내보내기” 되었습니다
+                      </RemovedText>
+                    ) : (
+                      <RemoveBtn onClick={() => handleRemove(m.id)}>
+                        내보내기
+                      </RemoveBtn>
+                    )}
+                  </MemberItem>
+                ))}
           </MemberList>
           <SaveBtn onClick={handleSave}>저장하기</SaveBtn>
         </Card>
