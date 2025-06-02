@@ -241,7 +241,7 @@ const TeamDetail = () => {
   const [status, setStatus] = useState("recruiting");
 
   // 공지사항 관련 state
-  const [noticePage, setNoticePage] = useState(1);
+  const [noticePage, setNoticePage] = useState(0);
   const [notices, setNotices] = useState([]);
   const [noticeTotalPages, setNoticeTotalPages] = useState(1);
 
@@ -292,7 +292,7 @@ const TeamDetail = () => {
 
           // “현재 로그인한 유저가 팀장인지” 판별해서 isLeader 세팅
           // 예시: data.leaderId가 123이고, 내 userId도 123이면 true
-          const myUserId = 2; // 저장 방식에 따라 조정
+          const myUserId = 1; // 저장 방식에 따라 조정
           setIsLeader(data.leaderId === myUserId);
         }
       } catch (err) {
@@ -386,11 +386,6 @@ const TeamDetail = () => {
           <CollaboSection>
             {/* 공지사항 카드 */}
             <CardContainer>
-              <CardHeader>
-                <h2>공지사항</h2>
-                <ManageBtn $variant="action">글쓰기</ManageBtn>
-              </CardHeader>
-
               <NoticeCard
                 notices={notices}
                 ManageBtn={ManageBtn}
@@ -403,10 +398,6 @@ const TeamDetail = () => {
 
             {/* 협업 관련 링크 카드 */}
             <CardContainer>
-              <CardHeader>
-                <h2>협업 링크</h2>
-                <ManageBtn $variant="action">링크 관리</ManageBtn>
-              </CardHeader>
 
               <CollaboLinkCard
                 CardHeader={CardHeader}

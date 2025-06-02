@@ -24,6 +24,7 @@ import UnivVerifyPage from "./screen/UnivVerifyPage";
 import axios from "axios";
 import RequireAuth from "../utils/RequireAuth";
 import TeamApplication from "./screen/team/TeamApplication";
+import NoticePage from "./screen/team/NoticePage";
 
 const App = () => {
   return (
@@ -92,6 +93,14 @@ const App = () => {
                   element={
                     <RequireAuth>
                       <TeamApplication />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="notices/:notifyId"
+                  element={
+                    <RequireAuth>
+                      <NoticePage />
                     </RequireAuth>
                   }
                 />

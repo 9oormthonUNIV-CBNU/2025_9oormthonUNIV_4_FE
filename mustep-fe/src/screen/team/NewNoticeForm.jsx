@@ -133,7 +133,7 @@ const NewNoticeForm = () => {
 
   const [title, setTitle] = useState("");
   const [contents, setContents] = useState("");
-  const MAX_LEN = 3000;
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -201,12 +201,10 @@ const NewNoticeForm = () => {
               id="contents"
               placeholder="내용을 입력해주세요."
               contents={contents}
-              maxLength={MAX_LEN}
               setContents={setContents}
-              required
             />
             <CharCount>
-              {contents.length}/{MAX_LEN}
+              {contents.length}
             </CharCount>
           </TextareaWrapper>
         </RowGroup>
