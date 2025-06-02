@@ -131,7 +131,7 @@ const TeamInfo = ({
         )}
       </TextRow>
       {fileUrl ? (
-        <DownloadBtn href={fileUrl} target="_blank" rel="noreferrer">
+        <DownloadBtn href={fileUrl} target="_blank" rel="noreferrer" download>
           <LuDownload size={16} />
           첨부파일 다운로드
         </DownloadBtn>

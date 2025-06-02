@@ -13,11 +13,8 @@ import TeamManageModal from "../../components/modals/TeamManageModal";
 import DummyTeamMember from "../../../utils/DummyData";
 import TeamApplyModal from "../../components/modals/TeamApplyModal";
 import CollaboManageModal from "../../components/modals/CollaboManageModal";
-import CollaboDummyData from "../../../utils/CollaboDummyData";
 import SubmitDocsModal from "../../components/modals/SubmitDocsModal";
 import axios from "axios";
-
-// import MemberCard from '../../components/team/MemberCard'  // 차후에 짜실 카드 컴포넌트
 
 const PageWrapper = styled.main`
   padding: 45px 360px;
@@ -41,13 +38,6 @@ const TopSection = styled.section`
   padding: 0 30px;
 `;
 
-const InfoBlock = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
 const TeamIntroduce = styled.section`
   display: flex;
   flex-direction: column;
@@ -57,19 +47,17 @@ const TeamIntroduce = styled.section`
   p {
     font-size: 1rem;
   }
-
   h1 {
     font-size: 1.5rem;
     font-weight: bold;
     margin: 0.2rem 0px;
   }
-
   & > button {
     align-self: flex-end;
   }
 `;
 
-// 공지사항 & 협업링크 묶음
+// 공지사항 & 협업 링크 묶음
 const CollaboSection = styled.div`
   display: flex;
   gap: 24px;
@@ -164,45 +152,42 @@ const ManageBtn = styled.button`
   border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
   border-color: ${({ theme }) => theme.colors.gray3};
 
-  /* $variant 에 따라 background / color / border 를 다르게 */
   background: ${({ theme, $variant }) => {
     switch ($variant) {
-      // 공개 보기 모드 수정하기
       case "mode":
-        return theme.colors.gray1;
-      // 글쓰기 / 링크 관리
       case "action":
-        return theme.colors.gray1;
-      // 팀원관리 / 팀 신청자 보기
+        return $variant === "mode"
+          ? theme.colors.gray1
+          : theme.colors.gray1;
       case "control":
         return theme.colors.white;
       default:
         return theme.colors.gray1;
     }
   }};
-
   color: ${({ theme, $variant }) => {
     switch ($variant) {
       case "mode":
         return theme.colors.gray4;
       case "action":
-        return theme.colors.gray6;
       case "control":
         return theme.colors.gray6;
       default:
         return theme.colors.gray4;
     }
   }};
-
   border: ${({ theme, $variant }) =>
     $variant === "control" ? `1px solid ${theme.colors.gray2}` : "none"};
+  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
 
   &:hover {
-    background: ${({ theme, $variant }) =>
-      $variant === "mode"
+    background: ${({ theme, $variant, disabled }) =>
+      disabled
+        ? theme.colors.gray1
+        : $variant === "mode"
         ? theme.colors.gray3
         : $variant === "action"
         ? theme.colors.gray3
@@ -233,127 +218,164 @@ const JoinButtonWrapper = styled.div`
 const TeamDetail = () => {
   const navigate = useNavigate();
   const { teamId } = useParams();
+
+  // 1) 로그인된 사용자 정보(userId)
+  const [userId, setUserId] = useState(null);
+
+  // 2) 팀 상세 정보
   const [teamDetail, setTeamDetail] = useState(null);
+
+  // 3) 역할 구분
+  const [isLeader, setIsLeader] = useState(false);
+  const [isMember, setIsMember] = useState(false);
+
+  // 기타 상태들
   const [leaderName, setLeaderName] = useState("");
   const [members, setMembers] = useState(DummyTeamMember);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLeader, setIsLeader] = useState(false);
   const [status, setStatus] = useState("recruiting");
 
-  // 공지사항 관련 state
+  // 공지사항
   const [noticePage, setNoticePage] = useState(1);
   const [notices, setNotices] = useState([]);
   const [noticeTotalPages, setNoticeTotalPages] = useState(1);
 
+  // 협업 링크
   const [collabPage, setCollabPage] = useState(1);
-  const [collaboLinks, setCollaboLinks] = useState([]); // 서버에서 받아올 “현재 페이지” 링크 배열
-  const [collabTotalPages, setCollabTotalPages] = useState(1); // 서버가 알려주는 총 페이지 개수
+  const [collaboLinks, setCollaboLinks] = useState([]);
+  const [collabTotalPages, setCollabTotalPages] = useState(1);
 
+  // 모달 표시 여부
   const [showTeamManageModal, setShowTeamManageModal] = useState(false);
   const [showApplyManageModal, setShowApplyManageModal] = useState(false);
   const [showCollaboModal, setCollaboModal] = useState(false);
   const [showDocsModal, setShowDocsModal] = useState(false);
 
-  const [collaboes, setCollaboes] = useState(CollaboDummyData);
+  // ──────────────────────────────────────────────────────
+  // 1) 로그인된 사용자 정보(userId) 가져오기
+  // ──────────────────────────────────────────────────────
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("⚠️ 토큰이 localStorage에 없습니다.");
+        return;
+      }
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        // 응답 예시: { userId: 2, nickname: "...", ... }
+        setUserId(res.data.userId);
+      } catch (err) {
+        console.error("유저 정보 조회 실패:", err);
+      }
+    };
+    fetchUserInfo();
+  }, []);
 
+  // ──────────────────────────────────────────────────────
+  // 2) 팀 상세 정보 가져오기 (teamId 또는 userId가 바뀔 때마다)
+  // ──────────────────────────────────────────────────────
   useEffect(() => {
     if (!teamId) return;
 
     const fetchTeamDetail = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("⚠️ 토큰이 localStorage에 없습니다.");
+        return;
+      }
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          console.error("⚠️ 토큰이 localStorage에 없습니다.");
-          return;
-        }
-
         const res = await axios.get(
           `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/teams/${teamId}`,
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: "Bearer " + token,
-              // 필요시 토큰이나 다른 헤더 추가
+              Authorization: `Bearer ${token}`,
             },
           }
         );
-
         if (res.data && res.data.data) {
           const data = res.data.data;
-
-          // 받은 데이터를 state에 세팅
           setTeamDetail(data);
           setMembers(data.members || []);
           setStatus(data.status);
-          setLeaderName(() => {
-            const leaderObj = data.members.find((m) => m.leader === true);
-            return leaderObj ? leaderObj.username : "";
-          });
 
-          // “현재 로그인한 유저가 팀장인지” 판별해서 isLeader 세팅
-          // 예시: data.leaderId가 123이고, 내 userId도 123이면 true
-          const myUserId = 1; // 저장 방식에 따라 조정
-          setIsLeader(data.leaderId === myUserId);
+          // 팀장 이름 세팅
+          const leaderObj = data.members.find((m) => m.leader === true);
+          setLeaderName(leaderObj ? leaderObj.username : "");
+
+          // userId와 비교하여 역할 결정
+          if (userId !== null) {
+            setIsLeader(data.leaderId === userId);
+            setIsMember(
+              Array.isArray(data.members) &&
+                data.members.some((m) => m.userId === userId)
+            );
+          }
         }
       } catch (err) {
-        console.error("팀 상세 정보 조회 실패", err);
+        console.error("팀 상세 정보 조회 실패:", err);
       }
     };
 
     fetchTeamDetail();
-  }, [teamId]);
+  }, [teamId, userId]);
 
+  // ──────────────────────────────────────────────────────
+  // 3) 공지사항 목록 가져오기 (teamId 또는 noticePage가 바뀔 때마다)
+  // ──────────────────────────────────────────────────────
   useEffect(() => {
     if (!teamId) return;
-
     const fetchNotices = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("⚠️ 토큰이 localStorage에 없습니다.");
+        return;
+      }
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          console.error("⚠️ 토큰이 localStorage에 없습니다.");
-          return;
-        }
-
-        // 서버 API 예시: GET /api/teams/:teamId/notifies?page=noticePage
         const res = await axios.get(
-          `${
-            import.meta.env.VITE_SERVER_END_POINT
-          }/api/teams/${teamId}/notifies?page=${noticePage}`,
+          `${import.meta.env.VITE_SERVER_END_POINT}/api/teams/${teamId}/notifies?page=${noticePage}`,
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: "Bearer " + token,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
-
         if (res.data && res.data.data) {
           const { content, totalPages } = res.data.data;
           setNotices(content);
           setNoticeTotalPages(totalPages);
         }
       } catch (err) {
-        console.error("공지사항 조회 실패", err);
+        console.error("공지사항 조회 실패:", err);
       }
     };
-
     fetchNotices();
   }, [teamId, noticePage]);
 
+  // ──────────────────────────────────────────────────────
+  // 4) 협업 링크 목록 가져오기 (teamId 또는 collabPage가 바뀔 때마다)
+  // ──────────────────────────────────────────────────────
   useEffect(() => {
     if (!teamId) return;
     const fetchCollaboLinks = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
       try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
         const res = await axios.get(
-          `${
-            import.meta.env.VITE_SERVER_END_POINT
-          }/api/v1/tool-links?page=${collabPage}`,
+          `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links?page=${collabPage}`,
           {
             headers: {
               accept: "*/*",
-              Authorization: "Bearer " + token,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -369,6 +391,7 @@ const TeamDetail = () => {
     fetchCollaboLinks();
   }, [teamId, collabPage]);
 
+  // 로딩 처리: teamDetail이 아직 없으면 간단히 “로딩 중” 표시
   if (!teamDetail) {
     return <PageWrapper>로딩 중...</PageWrapper>;
   }
@@ -376,6 +399,7 @@ const TeamDetail = () => {
   return (
     <>
       <PageWrapper>
+        {/* 뒤로가기 */}
         <HeaderRow onClick={() => navigate(-1)}>
           <ArrowForward />
         </HeaderRow>
@@ -394,14 +418,22 @@ const TeamDetail = () => {
           />
           <ProjectCard project={teamDetail.project} />
         </TopSection>
+
         <Divider />
+
+        {/* 한줄 소개 & 가입 신청 버튼 */}
         <TeamIntroduce>
-          {isLeader ? (
-            <ManageBtn $variant="mode">공개 보기 모드 수정하기</ManageBtn>
-          ) : null}
+          {/* 팀장만 “공개 보기 모드 수정하기” 버튼 활성화 */}
+          {isLeader && (
+            <ManageBtn $variant="mode" disabled={false}>
+              공개 보기 모드 수정하기
+            </ManageBtn>
+          )}
           <p>한줄소개</p>
-          <h1>“{(teamDetail && teamDetail.content) || ""}”</h1>
-          {!isLeader && (
+          <h1>“{teamDetail.content || ""}”</h1>
+
+          {/* 비회원(=팀원이 아닌 경우)만 보이는 “가입 신청하기” */}
+          {!isMember && (
             <JoinButtonWrapper>
               <button onClick={() => navigate(`/teams/${teamId}/apply`)}>
                 가입 신청하러 가기
@@ -410,10 +442,10 @@ const TeamDetail = () => {
           )}
         </TeamIntroduce>
 
-        {/* 공지사항 & 협업링크 */}
-        {isLeader ? (
+        {/* 팀원 or 팀장 둘 다 볼 수 있는 영역 (공지사항 / 협업링크) */}
+        {isMember && (
           <CollaboSection>
-            {/* 공지사항 카드 */}
+            {/* ─ 공지사항 카드 ─ */}
             <CardContainer>
               <NoticeCard
                 notices={notices}
@@ -422,10 +454,12 @@ const TeamDetail = () => {
                 page={noticePage}
                 totalPages={noticeTotalPages}
                 onChangePage={(newPage) => setNoticePage(newPage)}
+                // 팀장이 아니면 “글쓰기” 버튼 비활성화
+                ManageBtnDisabled={!isLeader}
               />
             </CardContainer>
 
-            {/* 협업 관련 링크 카드 */}
+            {/* ─ 협업 관련 링크 카드 ─ */}
             <CardContainer>
               <CollaboLinkCard
                 CardHeader={CardHeader}
@@ -433,6 +467,7 @@ const TeamDetail = () => {
                 collaboes={collaboLinks}
                 setCollaboes={setCollaboLinks}
                 setShowModal={setCollaboModal}
+                ManageBtnDisabled={!isLeader}
               />
               <Pagination
                 page={collabPage}
@@ -441,20 +476,25 @@ const TeamDetail = () => {
               />
             </CardContainer>
           </CollaboSection>
-        ) : null}
+        )}
 
-        {/* 팀원 목록 */}
-        <MemberSection>
-          <MemberCard
-            isLeader={isLeader}
-            members={teamDetail.members}
-            TextRow={TextRow}
-            ManageBtn={ManageBtn}
-            setShowModal={setShowTeamManageModal}
-            setShowApplyModal={setShowApplyManageModal}
-          />
-        </MemberSection>
+        {/* 팀원 목록(팀원이나 팀장 둘 다 보임) */}
+        {isMember && (
+          <MemberSection>
+            <MemberCard
+              isLeader={isLeader}
+              members={teamDetail.members}
+              TextRow={TextRow}
+              ManageBtn={ManageBtn}
+              setShowModal={setShowTeamManageModal}
+              setShowApplyModal={setShowApplyManageModal}
+              // 팀장이 아니면 “팀원 관리” 버튼 비활성화
+              ManageBtnDisabled={!isLeader}
+            />
+          </MemberSection>
+        )}
 
+        {/* 팀장 전용 “프로젝트 끝내기” / “최종 산출물 제출하기” */}
         {isLeader && (
           <ActionSection>
             <EndProjectBtn>프로젝트 끝내기</EndProjectBtn>
@@ -464,12 +504,15 @@ const TeamDetail = () => {
           </ActionSection>
         )}
       </PageWrapper>
+
+      {/* ───────── 모달 ───────── */}
       {showTeamManageModal && (
         <TeamManageModal
           teamId={teamId}
           members={teamDetail.members}
           setMembers={setMembers}
           setShowModal={setShowTeamManageModal}
+          disabled={!isLeader} // 팀장이 아니면 실제 수정 기능 잠금
         />
       )}
       {showApplyManageModal && (
@@ -480,9 +523,10 @@ const TeamDetail = () => {
       )}
       {showCollaboModal && (
         <CollaboManageModal
-          collaboes={collaboes}
-          setCollaboes={setCollaboes}
+          collaboes={collaboLinks}
+          setCollaboes={setCollaboLinks}
           setShowModal={setCollaboModal}
+          disabled={!isLeader} // 팀장이 아니면 수정 기능 잠금
         />
       )}
       {showDocsModal && <SubmitDocsModal setShowModal={setShowDocsModal} />}

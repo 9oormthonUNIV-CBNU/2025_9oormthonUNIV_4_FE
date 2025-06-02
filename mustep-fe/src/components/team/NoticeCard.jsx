@@ -54,6 +54,7 @@ const NoticeCard = ({
   page = 0,
   totalPages = 1,
   onChangePage,
+  ManageBtnDisabled,
 }) => {
   const { teamId } = useParams();
   const navigate = useNavigate();
@@ -61,9 +62,11 @@ const NoticeCard = ({
     <>
       <CardHeader>
         <h2>공지사항</h2>
-        <Link to={`/teams/${teamId}/newnotice`}>
-          <ManageBtn $variant="action">글쓰기</ManageBtn>
-        </Link>
+        {!ManageBtnDisabled && (
+          <Link to={`/teams/${teamId}/newnotice`}>
+            <ManageBtn $variant="action">글쓰기</ManageBtn>
+          </Link>
+        )}
       </CardHeader>
       <NoticeList>
         {notices.length === 0 ? (
@@ -72,7 +75,10 @@ const NoticeCard = ({
           </NoticeItem>
         ) : (
           notices.map((notice) => (
-            <NoticeItem onClick={() => navigate(`/teams/${teamId}/notices/${notice.id}`)} key={notice.id}>
+            <NoticeItem
+              onClick={() => navigate(`/teams/${teamId}/notices/${notice.id}`)}
+              key={notice.id}
+            >
               <NoticeText>{notice.title}</NoticeText>
               <NoticeMeta>
                 {/* 예시: createdAt = "2025-06-02 06:38" */}

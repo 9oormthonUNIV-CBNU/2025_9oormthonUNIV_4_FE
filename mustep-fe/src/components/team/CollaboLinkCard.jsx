@@ -29,14 +29,17 @@ const CollaboLinkCard = ({
   ManageBtn,
   collaboes = [],
   setShowModal,
+  ManageBtnDisabled,
 }) => {
   return (
     <>
       <CardHeader>
         <h2>협업 관련 링크</h2>
-        <ManageBtn $variant="action" onClick={() => setShowModal(true)}>
-          링크 관리
-        </ManageBtn>
+        {!ManageBtnDisabled && (
+          <ManageBtn $variant="action" onClick={() => setShowModal(true)}>
+            링크 관리
+          </ManageBtn>
+        )}
       </CardHeader>
       <CollaboLinkList>
         {collaboes.length === 0 ? (
