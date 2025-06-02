@@ -394,6 +394,48 @@ const TeamDetail = () => {
     fetchCollaboLinks();
   }, [teamId, collabPage]);
 
+  const handleEndProject = async () => {
+    const confirmed = window.confirm("정말 프로젝트를 끝내시겠습니까?");
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
+      await axios.delete(
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/teams/${teamId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("프로젝트가 성공적으로 종료되었습니다.");
+      // 삭제 후 프로젝트 팀 목록으로 이동
+      const projectId = teamDetail.project.id;
+      navigate(`/projects/${projectId}/teams`);
+    } catch (err) {
+      if (err.response) {
+        console.error(
+          "🛑 프로젝트 종료 실패:",
+          err.response.status,
+          err.response.data
+        );
+        alert(
+          `프로젝트 종료에 실패했습니다: ${err.response.data.message || ""}`
+        );
+      } else {
+        console.error("🛑 네트워크/클라이언트 에러:", err);
+        alert("프로젝트 종료 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
   // 로딩 처리: teamDetail이 아직 없으면 간단히 “로딩 중” 표시
   if (!teamDetail) {
     return (
@@ -509,7 +551,7 @@ const TeamDetail = () => {
         {/* 팀장 전용 “프로젝트 끝내기” / “최종 산출물 제출하기” */}
         {isLeader && (
           <ActionSection>
-            <EndProjectBtn>프로젝트 끝내기</EndProjectBtn>
+            <EndProjectBtn onClick={handleEndProject} >프로젝트 끝내기</EndProjectBtn>
             <SubmitFinalBtn onClick={() => setShowDocsModal(true)}>
               최종 산출물 제출하기
             </SubmitFinalBtn>
