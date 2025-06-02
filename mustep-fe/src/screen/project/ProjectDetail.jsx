@@ -471,6 +471,8 @@ const ProjectDetail = () => {
     );
   }
 
+  
+
   return (
     <Container>
       <TabRow>
@@ -493,7 +495,7 @@ const ProjectDetail = () => {
         {/* 좌측: 이미지(포스터) */}
         <PosterWrapper>
           <img
-            src={`https://www.syu.ac.kr/wp-content/uploads/2020/07/%EA%B3%B5%EB%AA%A8%EC%A0%84-%ED%8F%AC%EC%8A%A4%ED%84%B0-scaled.jpg`}
+            src={project.imageUrl}
             alt="프로젝트 포스터"
           />
         </PosterWrapper>
@@ -546,6 +548,7 @@ const ProjectDetail = () => {
               href={project.fileUrl}
               target="_blank"
               rel="noreferrer"
+              download
             >
               <LuDownload /> 추가 파일 다운로드
             </DownloadButton>
@@ -562,7 +565,7 @@ const ProjectDetail = () => {
               <SimilarItem key={sim.id}>
                 <img
                   src={
-                    `https://www.syu.ac.kr/wp-content/uploads/2020/07/%EA%B3%B5%EB%AA%A8%EC%A0%84-%ED%8F%AC%EC%8A%A4%ED%84%B0-scaled.jpg` ||
+                    sim.imageUrl ||
                     null
                   }
                   alt={sim.title}

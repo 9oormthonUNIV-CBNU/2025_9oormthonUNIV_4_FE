@@ -32,7 +32,6 @@ const BtnGroup = styled.div`
   gap: 8px;
 `;
 
-
 const LoginBtn = styled.button`
   display: flex;
   align-items: center;
@@ -43,9 +42,9 @@ const LoginBtn = styled.button`
   height: 36px;
   font-size: 16px;
   font-weight: bold;
-  background-color: ${({theme}) => theme.colors.black};
+  background-color: ${({ theme }) => theme.colors.black};
   border: none;
-  color: ${({theme}) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.white};
   cursor: pointer;
 `;
 
@@ -59,12 +58,11 @@ const JoinBtn = styled.button`
   height: 36px;
   font-size: 16px;
   font-weight: bold;
-  background-color: ${({theme}) => theme.colors.primary};
-  color: ${({theme}) => theme.colors.white};
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
   border: none;
   cursor: pointer;
 `;
-
 
 const AuthBtn = styled.button`
   display: flex;
@@ -108,12 +106,16 @@ const Navbar = () => {
     setToken(rawToken);
   }, []);
 
-  useEffect(() =>{
-    if (!token) return;
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      setToken(null);
+      return;
+    }
 
     const fetchUserInfo = async () => {
       try {
-        const res = await axios.get(`
+        const res = await axios.get(
+          `
           ${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
           {
             headers: {
@@ -121,13 +123,12 @@ const Navbar = () => {
               Authorization: `Bearer ${token}`,
             },
           }
-
         );
         setUserInfo(res.data);
       } catch (err) {
         console.error("에러 발생:", err);
       }
-    }
+    };
     fetchUserInfo();
   }, [token]);
 
@@ -149,10 +150,15 @@ const Navbar = () => {
           <AuthBtn onClick={() => navigate("/mypage")}>
             {/* userInfo.imgUrl이 반드시 존재한다고 가정하나, 
                 혹시 없을 수 있으니 기본 User 아이콘도 옵션으로 준비 */}
-            <UserImg
-              src={userInfo.imgUrl ? userInfo.imgUrl : User}
-              alt="user_icon"
-            />
+            {userInfo.imgUrl ? (
+              <UserImg
+                src={userInfo.imgUrl ? userInfo.imgUrl : User}
+                alt="user_icon"
+              />
+            ) : (
+              <User width={20} height={20} />
+            )}
+
             {userInfo.nickname}
           </AuthBtn>
         </BtnGroup>
