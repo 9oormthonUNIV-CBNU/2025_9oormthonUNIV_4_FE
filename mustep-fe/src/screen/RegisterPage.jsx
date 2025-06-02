@@ -132,8 +132,7 @@ const RegisterPage = () => {
       major: major,
       university: univ,
       introduce: userInfo,
-      imgUrl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkMrDfL1jdluKhYhszOe_NOrvVfGhv1l5EsdI8-mHkVEo4g4ci1lgI7QTbpNGgmQdgEsfPSOWidY1eusytDJSAWMomCi-6kyOZBf1Pbw4",
+      imgUrl: null,
     };
     try {
       const token = localStorage.getItem("token");
