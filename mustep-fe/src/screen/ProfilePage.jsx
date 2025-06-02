@@ -71,7 +71,14 @@ const AvatarWrapper = styled.div`
     height: 100%;
     object-fit: cover;
   }
+
 `;
+
+const StyledUser = styled(UserIcon)`
+  width: 100%;
+  height: 100%;
+      object-fit: cover;
+`
 
 const InfoWrapper = styled.div`
   flex: 1;
@@ -445,7 +452,7 @@ const ProfilePage = () => {
             {imgUrl ? (
               <img src={imgUrl} alt="프로필" />
             ) : (
-              <img src={UserIcon} alt="기본 프로필" />
+              <StyledUser/>
             )}
           </AvatarWrapper>
           <input
