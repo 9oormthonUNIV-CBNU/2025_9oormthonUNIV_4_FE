@@ -3,6 +3,7 @@ import styled from "styled-components";
 import CloseIcon from "../../assets/close_btn.svg";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import NoItem from "../NoItem";
 
 const Overlay = styled.div`
   position: fixed;
@@ -138,7 +139,23 @@ const TeamApplyModal = ({ teamId, setShowModal }) => {
     fetchGetApplications();
   }, []);
 
-  
+  if (applications.length === 0) {
+    return (
+      <Overlay>
+        <Card>
+          <span
+            style={{ alignSelf: "self-end" }}
+            onClick={() => setShowModal(false)}
+          >
+            <CloseBtn />
+          </span>
+          <Title>팀 신청 관리</Title>
+          <NoItem />
+        </Card>
+      </Overlay>
+    );
+  }
+
   return (
     <Overlay>
       <Card>

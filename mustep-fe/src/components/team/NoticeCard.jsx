@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Pagination from "./Pagination";
 import { formatTimeAgo } from "../../../utils/Utils";
 import { Link, useNavigate, useParams } from "react-router";
+import NoItem from "../NoItem";
 
 const NoticeList = styled.ul`
   list-style: none;
@@ -51,13 +52,30 @@ const NoticeCard = ({
   notices = [],
   CardHeader,
   ManageBtn,
-  page = 0,
+  page = 1,
   totalPages = 1,
   onChangePage,
   ManageBtnDisabled,
 }) => {
   const { teamId } = useParams();
   const navigate = useNavigate();
+
+  if (notices.length === 0) {
+    return (
+      <>
+        <CardHeader>
+          <h2>공지사항</h2>
+          {!ManageBtnDisabled && (
+            <Link to={`/teams/${teamId}/newnotice`}>
+              <ManageBtn $variant="action">글쓰기</ManageBtn>
+            </Link>
+          )}
+        </CardHeader>
+        <NoItem />
+      </>
+    );
+  }
+
   return (
     <>
       <CardHeader>

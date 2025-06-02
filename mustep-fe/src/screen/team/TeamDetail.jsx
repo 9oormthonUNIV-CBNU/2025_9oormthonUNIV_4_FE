@@ -371,7 +371,7 @@ const TeamDetail = () => {
       if (!token) return;
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links?page=${collabPage}`,
+          `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/teams/${teamId}?page=${collabPage}`,
           {
             headers: {
               accept: "*/*",
@@ -415,6 +415,7 @@ const TeamDetail = () => {
             maxUserCount={teamDetail.maxUserCount}
             memberCount={teamDetail.memberCount}
             leaderName={leaderName}
+            teamId={teamId}
           />
           <ProjectCard project={teamDetail.project} />
         </TopSection>
