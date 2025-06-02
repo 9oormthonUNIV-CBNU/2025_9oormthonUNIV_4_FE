@@ -160,9 +160,7 @@ const ManageBtn = styled.button`
     switch ($variant) {
       case "mode":
       case "action":
-        return $variant === "mode"
-          ? theme.colors.gray1
-          : theme.colors.gray1;
+        return $variant === "mode" ? theme.colors.gray1 : theme.colors.gray1;
       case "control":
         return theme.colors.white;
       default:
@@ -342,7 +340,9 @@ const TeamDetail = () => {
       }
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_SERVER_END_POINT}/api/teams/${teamId}/notifies?page=${noticePage}`,
+          `${
+            import.meta.env.VITE_SERVER_END_POINT
+          }/api/teams/${teamId}/notifies?page=${noticePage}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -372,7 +372,9 @@ const TeamDetail = () => {
       if (!token) return;
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/teams/${teamId}?page=${collabPage}`,
+          `${
+            import.meta.env.VITE_SERVER_END_POINT
+          }/api/v1/tool-links/teams/${teamId}?page=${collabPage}`,
           {
             headers: {
               accept: "*/*",
@@ -394,7 +396,11 @@ const TeamDetail = () => {
 
   // 로딩 처리: teamDetail이 아직 없으면 간단히 “로딩 중” 표시
   if (!teamDetail) {
-    return <PageWrapper><Loading /></PageWrapper>;
+    return (
+      <PageWrapper>
+        <Loading />
+      </PageWrapper>
+    );
   }
 
   return (
@@ -427,7 +433,11 @@ const TeamDetail = () => {
         <TeamIntroduce>
           {/* 팀장만 “공개 보기 모드 수정하기” 버튼 활성화 */}
           {isLeader && (
-            <ManageBtn $variant="mode" disabled={false}>
+            <ManageBtn
+              $variant="mode"
+              disabled={false}
+              onClick={() => navigate(`/teams/${teamId}/edit`)}
+            >
               공개 보기 모드 수정하기
             </ManageBtn>
           )}

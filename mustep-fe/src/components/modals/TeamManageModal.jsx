@@ -197,7 +197,7 @@ const TeamManageModal = ({ teamId, members, setMembers, setShowModal }) => {
     }
   };
 
-  if (members.length === 0) {
+  if (!members) {
     return (
       <Overlay>
         <Card>
@@ -205,7 +205,7 @@ const TeamManageModal = ({ teamId, members, setMembers, setShowModal }) => {
             style={{ alignSelf: "self-end" }}
             onClick={() => setShowModal(false)}
           >
-            <CloseBtn />
+          <CloseBtn />
           </span>
           <Title>팀 관리하기</Title>
           <NoItem />
