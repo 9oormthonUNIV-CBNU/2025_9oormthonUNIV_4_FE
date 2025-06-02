@@ -3,6 +3,8 @@ import styled from "styled-components";
 import AlertIcon from "../../assets/AlertIcon.svg";
 import CheckIcon from "../../assets/check_icon.svg";
 import CloseIcon from "../../assets/close_btn.svg";
+import { useParams } from "react-router";
+import axios from "axios";
 
 const Overlay = styled.div`
   position: fixed;
@@ -119,10 +121,64 @@ const CloseBtn = styled(CloseIcon)`
   cursor: pointer;
 `;
 
-const AddLink = ({setShowModal}) => {
-  const [link, setLink] = useState("");
+const ErrorMsg = styled.div`
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 8px;
+`;
 
-  const handleAddLink = () => {};
+const AddLink = ({setShowModal, onNewLinkAdded}) => {
+  const { teamId } = useParams();
+  const [link, setLink] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+
+  const handleAddLink = async () => {
+    if (!link.trim()) {
+      setError("링크를 입력해주세요.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        setLoading(false);
+        return;
+      }
+
+      // POST /api/v1/tool-links/{teamId}
+      await axios.post(
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/${teamId}`,
+        {
+          toolLink: link.trim(),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+
+      // 추가 성공 시 콜백 호출 (예: 부모가 링크 목록을 다시 로드)
+      if (onNewLinkAdded) {
+        onNewLinkAdded();
+      }
+
+      // 모달 닫기
+      setShowModal(false);
+    } catch (err) {
+      console.error("협업 링크 추가 실패:", err);
+      setError("링크 추가 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Overlay>
@@ -139,11 +195,13 @@ const AddLink = ({setShowModal}) => {
             placeholder="링크를 입력해주세요."
             value={link}
             onChange={(e) => setLink(e.target.value)}
+            disabled={loading}
           />
-          <AddBtn type="button" onClick={handleAddLink}>
-            확인
+          <AddBtn disabled={loading} onClick={handleAddLink}>
+            {loading ? "추가 중..." : "확인"}
           </AddBtn>
         </InputBlock>
+        {error && <ErrorMsg>{error}</ErrorMsg>}
       </Card>
     </Overlay>
   );
