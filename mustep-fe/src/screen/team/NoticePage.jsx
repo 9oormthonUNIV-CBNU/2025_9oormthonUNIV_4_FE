@@ -19,7 +19,7 @@ const PageWrapper = styled.main`
 const HeaderRow = styled.div`
   display: flex;
   align-items: center;
-  cursor: pointer;
+
   color: #545661;
 `;
 
@@ -223,14 +223,51 @@ const NoticePage = () => {
   const { title, content, createdAt } = notice;
   const formattedDate = new Date(createdAt).toLocaleDateString();
 
+
+  const handleDelete = async () => {
+    // 한 번 더 확인
+    const confirmed = window.confirm("정말 이 공지사항을 삭제하시겠습니까?");
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
+      // DELETE 요청 보내기
+      await axios.delete(
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/teams/${teamId}/notifies/${notifyId}`,
+        {
+          headers: {
+            Accept: "*/*",
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+
+      // 삭제 성공 시
+      alert("공지사항이 삭제되었습니다.");
+      // 공지 목록(또는 팀 상세) 화면으로 돌아가기
+      navigate(`/teams/${teamId}`);
+    } catch (err) {
+      console.error("공지사항 삭제 실패:", err);
+      alert("공지사항 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <PageWrapper>
       {/* 1. 뒤로 가기 아이콘 */}
-      <HeaderRow onClick={() => navigate(-1)}>
-        <ArrowForward />
+      <HeaderRow >
+        <ArrowForward onClick={() => navigate(-1)} style={{cursor:"pointer"}}/>
         <BtnBlock>
-          <EditBtn>수정하기</EditBtn>
-          <DeleteBtn>삭제하기</DeleteBtn>
+          <EditBtn onClick={() => navigate(`/teams/${teamId}/notices/${notifyId}/edit`)} >수정하기</EditBtn>
+          <DeleteBtn onClick={handleDelete}>삭제하기</DeleteBtn>
         </BtnBlock>
       </HeaderRow>
 

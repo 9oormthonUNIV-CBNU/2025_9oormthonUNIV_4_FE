@@ -25,6 +25,7 @@ import axios from "axios";
 import RequireAuth from "../utils/RequireAuth";
 import TeamApplication from "./screen/team/TeamApplication";
 import NoticePage from "./screen/team/NoticePage";
+import EditNotice from "./screen/team/EditNotice";
 
 const App = () => {
   return (
@@ -101,6 +102,14 @@ const App = () => {
                   element={
                     <RequireAuth>
                       <NoticePage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="notices/:notifyId/edit"
+                  element={
+                    <RequireAuth>
+                      <EditNotice />
                     </RequireAuth>
                   }
                 />

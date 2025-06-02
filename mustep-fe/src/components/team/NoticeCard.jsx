@@ -3,7 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import Pagination from "./Pagination";
 import { formatTimeAgo } from "../../../utils/Utils";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 const NoticeList = styled.ul`
   list-style: none;
@@ -19,6 +19,11 @@ const NoticeItem = styled.li`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.gray1};
+  }
+
   &:last-child {
     border-bottom: 1px solid ${({ theme }) => theme.colors.gray2};
   }
@@ -51,6 +56,7 @@ const NoticeCard = ({
   onChangePage,
 }) => {
   const { teamId } = useParams();
+  const navigate = useNavigate();
   return (
     <>
       <CardHeader>
@@ -66,7 +72,7 @@ const NoticeCard = ({
           </NoticeItem>
         ) : (
           notices.map((notice) => (
-            <NoticeItem key={notice.id}>
+            <NoticeItem onClick={() => navigate(`/teams/${teamId}/notices/${notice.id}`)} key={notice.id}>
               <NoticeText>{notice.title}</NoticeText>
               <NoticeMeta>
                 {/* 예시: createdAt = "2025-06-02 06:38" */}
