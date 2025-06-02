@@ -15,6 +15,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github.css";
 import ShareModal from "../../components/modals/ShareModal";
+import Loading from "../../components/Loading";
 
 const Container = styled.div`
   display: flex;
@@ -461,7 +462,22 @@ const ProjectDetail = () => {
   if (loading) {
     return (
       <Container>
-        <p>로딩 중...</p>
+        <TabRow>
+          <Tab
+            to={`/projects/${projectId}`}
+            className={({ isActive }) => (isActive ? "active" : "")}
+            end
+          >
+            상세보기
+          </Tab>
+          <Tab
+            to={`/projects/${projectId}/teams`}
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            팀 목록보기
+          </Tab>
+        </TabRow>
+        <Loading />
       </Container>
     );
   }

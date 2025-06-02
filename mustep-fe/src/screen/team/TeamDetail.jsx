@@ -15,6 +15,7 @@ import TeamApplyModal from "../../components/modals/TeamApplyModal";
 import CollaboManageModal from "../../components/modals/CollaboManageModal";
 import SubmitDocsModal from "../../components/modals/SubmitDocsModal";
 import axios from "axios";
+import Loading from "../../components/Loading";
 
 const PageWrapper = styled.main`
   padding: 45px 360px;
@@ -393,7 +394,7 @@ const TeamDetail = () => {
 
   // 로딩 처리: teamDetail이 아직 없으면 간단히 “로딩 중” 표시
   if (!teamDetail) {
-    return <PageWrapper>로딩 중...</PageWrapper>;
+    return <PageWrapper><Loading /></PageWrapper>;
   }
 
   return (
