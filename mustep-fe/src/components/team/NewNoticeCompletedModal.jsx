@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import CheckIcon from '/src/assets/check_icon.svg';
+import { useNavigate } from "react-router";
 
 
 const Overlay = styled.div`
@@ -52,16 +53,17 @@ const Btn = styled.button`
   }
 `;
 
-const AuthAlertModal = ({ onClose }) => {
+const NewNoticeCompletedModal = ({ setShowModal }) => {
+  const navigate = useNavigate();
   return (
     <Overlay>
       <Card>
         <StyledCancle />
         <AlertMsg>작성이 완료되었습니다.</AlertMsg>
-        <Btn onClick={onClose}>확인</Btn>
+        <Btn onClick={() => {setShowModal(false); navigate(-1)}}>확인</Btn>
       </Card>
     </Overlay>
   );
 };
 
-export default AuthAlertModal;
+export default NewNoticeCompletedModal;

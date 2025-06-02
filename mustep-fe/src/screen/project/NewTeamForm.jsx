@@ -7,6 +7,7 @@ import ArrowForward from "../../assets/arrow_forward.svg";
 import { LuUpload } from "react-icons/lu";
 import axios from "axios";
 import AttachFileModal from "../../components/modals/AttachFileModal";
+import NewTeamModal from "../../components/team/NewTeamModal";
 
 const PageWrapper = styled.main`
   padding: 40px 360px;
@@ -236,7 +237,8 @@ const NewTeamForm = () => {
   const [endAt, setEndAt] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showFileModal, setShowFileModal] = useState(false);
-
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [teamId, setTeamId] = useState(null);
   const MAX_CONTENT_LEN = 100;
 
   useEffect(() => {
@@ -350,7 +352,7 @@ const NewTeamForm = () => {
         projectId: Number(projectId),
       };
 
-      await axios.post(
+      const res = await axios.post(
         `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/teams/create`,
         body,
         {
@@ -361,8 +363,9 @@ const NewTeamForm = () => {
         }
       );
 
-      alert("팀 생성이 완료되었습니다.");
-      navigate(`/projects/${projectId}/teams`);
+      setShowCompleteModal(true);
+      setTeamId(res.data.data.id);
+
     } catch (err) {
       console.error("팀 생성 중 오류 발생:", err);
       alert("팀 생성에 실패했습니다. 다시 시도해주세요.");
@@ -492,6 +495,13 @@ const NewTeamForm = () => {
         <AttachFileModal
           setShowModal={setShowFileModal}
           onDone={handleFileDone}
+        />
+      )}
+      {showCompleteModal && (
+        <NewTeamModal
+          setShowModal={setShowCompleteModal}
+          projectId={projectId}
+          teamId={teamId}
         />
       )}
     </>
