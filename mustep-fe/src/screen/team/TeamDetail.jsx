@@ -210,6 +210,26 @@ const ManageBtn = styled.button`
   }
 `;
 
+const JoinButtonWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+
+  & > button {
+    padding: 12px 32px;
+    background: ${({ theme }) => theme.colors.primary};
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    &:hover {
+      background: ${({ theme }) => theme.colors.primary_lite};
+    }
+  }
+`;
+
 const TeamDetail = () => {
   const navigate = useNavigate();
   const { teamId } = useParams();
@@ -272,7 +292,7 @@ const TeamDetail = () => {
 
           // “현재 로그인한 유저가 팀장인지” 판별해서 isLeader 세팅
           // 예시: data.leaderId가 123이고, 내 userId도 123이면 true
-          const myUserId = 1; // 저장 방식에 따라 조정
+          const myUserId = 2; // 저장 방식에 따라 조정
           setIsLeader(data.leaderId === myUserId);
         }
       } catch (err) {
@@ -321,7 +341,7 @@ const TeamDetail = () => {
   }, [teamId, noticePage]);
 
   if (!teamDetail) {
-    return <div style={{ padding: "24px" }}>로딩 중...</div>;
+    return <PageWrapper>로딩 중...</PageWrapper>;
   }
 
   return (
@@ -347,45 +367,65 @@ const TeamDetail = () => {
         </TopSection>
         <Divider />
         <TeamIntroduce>
-          <ManageBtn $variant="mode">공개 보기 모드 수정하기</ManageBtn>
+          {isLeader ? (
+            <ManageBtn $variant="mode">공개 보기 모드 수정하기</ManageBtn>
+          ) : null}
           <p>한줄소개</p>
           <h1>“{(teamDetail && teamDetail.content) || ""}”</h1>
+          {!isLeader && (
+            <button onClick={() => navigate(`/teams/${teamId}/apply`)}>
+              가입 신청하러 가기
+            </button>
+          )}
         </TeamIntroduce>
 
         {/* 공지사항 & 협업링크 */}
-        <CollaboSection>
-          {/* 공지사항 카드 */}
-          <CardContainer>
-            <NoticeCard
-              notices={notices}
-              ManageBtn={ManageBtn}
-              CardHeader={CardHeader}
-              page={noticePage}
-              totalPages={noticeTotalPages}
-              onChangePage={(newPage) => setNoticePage(newPage)}
-            />
-          </CardContainer>
+        {isLeader ? (
+          <CollaboSection>
+            {/* 공지사항 카드 */}
+            <CardContainer>
+              <CardHeader>
+                <h2>공지사항</h2>
+                <ManageBtn $variant="action">글쓰기</ManageBtn>
+              </CardHeader>
 
-          {/* 협업 관련 링크 카드 */}
-          <CardContainer>
-            <CollaboLinkCard
-              CardHeader={CardHeader}
-              ManageBtn={ManageBtn}
-              collaboes={collaboes}
-              setCollaboModal={setCollaboModal}
-              setShowModal={setCollaboModal}
-            />
-            <Pagination
-              page={currentPage}
-              total={4}
-              onChange={(newPage) => setCurrentPage(newPage)}
-            />
-          </CardContainer>
-        </CollaboSection>
+              <NoticeCard
+                notices={notices}
+                ManageBtn={ManageBtn}
+                CardHeader={CardHeader}
+                page={noticePage}
+                totalPages={noticeTotalPages}
+                onChangePage={(newPage) => setNoticePage(newPage)}
+              />
+            </CardContainer>
+
+            {/* 협업 관련 링크 카드 */}
+            <CardContainer>
+              <CardHeader>
+                <h2>협업 링크</h2>
+                <ManageBtn $variant="action">링크 관리</ManageBtn>
+              </CardHeader>
+
+              <CollaboLinkCard
+                CardHeader={CardHeader}
+                ManageBtn={ManageBtn}
+                collaboes={collaboes}
+                setCollaboModal={setCollaboModal}
+                setShowModal={setCollaboModal}
+              />
+              <Pagination
+                page={1}
+                total={1}
+                onChange={() => {}}
+              />
+            </CardContainer>
+          </CollaboSection>
+        ) : null}
 
         {/* 팀원 목록 */}
         <MemberSection>
           <MemberCard
+            isLeader={isLeader}
             members={teamDetail.members}
             TextRow={TextRow}
             ManageBtn={ManageBtn}
@@ -394,16 +434,18 @@ const TeamDetail = () => {
           />
         </MemberSection>
 
-        <ActionSection>
-          <EndProjectBtn>프로젝트 끝내기</EndProjectBtn>
-          <SubmitFinalBtn onClick={() => setShowDocsModal(true)}>
-            최종 산출물 제출하기
-          </SubmitFinalBtn>
-        </ActionSection>
+        {isLeader && (
+          <ActionSection>
+            <EndProjectBtn>프로젝트 끝내기</EndProjectBtn>
+            <SubmitFinalBtn onClick={() => setShowDocsModal(true)}>
+              최종 산출물 제출하기
+            </SubmitFinalBtn>
+          </ActionSection>
+        )}
       </PageWrapper>
       {showTeamManageModal && (
         <TeamManageModal
-          teamId={teamId} 
+          teamId={teamId}
           members={teamDetail.members}
           setMembers={setMembers}
           setShowModal={setShowTeamManageModal}
