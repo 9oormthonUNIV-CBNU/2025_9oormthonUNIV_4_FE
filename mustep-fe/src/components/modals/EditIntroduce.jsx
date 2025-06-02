@@ -91,46 +91,16 @@ const Label = styled.label`
   font-weight: 500;
 `;
 
-const EditIntroduce = ({ setShowModal }) => {
-  const { teamId } = useParams();
-  const [userInfo, setUserInfo] = useState(null);
-  const [introduce, setIntroduce] = useState("")
+const EditIntroduce = ({ initialIntroduce, setShowModal, onUpdateIntroduce }) => {
+  const [introText, setIntroText] = useState(initialIntroduce || "");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchIntroduce = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          alert("로그인이 필요합니다.");
-          setLoading(false);
-          return;
-        }
-
-        const res = await axios.get(
-          `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + token,
-            },
-          }
-        );
-
-        setUserInfo(res.data);
-        setIntroduce(res.data.introduce);
-      } catch (err) {
-        console.error("유저 정보 조회 실패", err);
-      }
-    };
-
-    fetchIntroduce();
-  }, []);
+    setIntroText(initialIntroduce || "");
+  }, [initialIntroduce]);
 
   const handleEdit = async () => {
     setLoading(true);
-    setError("");
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -139,14 +109,11 @@ const EditIntroduce = ({ setShowModal }) => {
         return;
       }
 
+      // 실제로 백엔드에 자기소개를 수정하는 PUT 요청
       await axios.put(
-        `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo`,
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/userinfo/mypage/introduce`,
         {
-          nickname: userInfo.nickname,
-          major: userInfo.major,
-          university: userInfo.university,
-          introduce: introduce,
-          imgUrl: userInfo.imgUrl,
+          introduce: introText,
         },
         {
           headers: {
@@ -155,9 +122,15 @@ const EditIntroduce = ({ setShowModal }) => {
           },
         }
       );
+
+      // 부모(ProfilePage)에 “수정된 텍스트”를 알려서 즉시 반영하게끔 콜백 호출
+      onUpdateIntroduce(introText);
+
+      // 모달 닫기
       setShowModal(false);
     } catch (err) {
-      console.error("유저 수정 조회 실패", err);
+      console.error("자기소개 수정 실패:", err);
+      alert("자기소개 수정 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -178,11 +151,9 @@ const EditIntroduce = ({ setShowModal }) => {
           <Label>자기소개</Label>
           <Input
             placeholder="자기 소개를 입력해주세요."
-            value={introduce}
-            onChange={(e) =>
-              setIntroduce(e.target.value)
-            }
-
+            value={introText}
+            onChange={(e) => setIntroText(e.target.value)}
+            disabled={loading}
           />
           <AddBtn disabled={loading} onClick={handleEdit}>
             {loading ? "추가 중..." : "확인"}

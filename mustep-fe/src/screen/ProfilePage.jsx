@@ -49,7 +49,7 @@ const RightSection = styled.div`
 `;
 
 const IntroduceBox = styled.div`
-  width: 30vw;
+  width: 25vw;
   height: 50px;
   background-color: ${({ theme }) => theme.colors.gray1};
   padding: 24px 36px;
@@ -98,6 +98,7 @@ const SchoolText = styled.span`
 
 const CertButton = styled.button`
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
   background: none;
@@ -340,6 +341,14 @@ const ProfilePage = () => {
     imgUrl,
   } = userInfo;
 
+  const handleUpdateIntroduce = (newIntroduce) => {
+    // 기존 userInfo 객체에서 introduce만 덮어씌워서 상태를 갱신합니다.
+    setUserInfo((prev) => ({
+      ...prev,
+      introduce: newIntroduce,
+    }));
+  };
+
   return (
     <>
       <PageWrapper>
@@ -379,7 +388,7 @@ const ProfilePage = () => {
                 </CertButton>
               ) : (
                 // 인증 안 된 경우
-                <CertButton onClick={() => navigate("/verify-university")}>
+                <CertButton onClick={() => navigate("/university")}>
                   대학 인증하기
                 </CertButton>
               )}
@@ -458,7 +467,7 @@ const ProfilePage = () => {
           )}
         </MyProjectsWrapper>
       </PageWrapper>
-      {showEditModal && <EditIntroduce setShowModal={setShowEditModal} />}
+      {showEditModal && <EditIntroduce initialIntroduce={introduce} setShowModal={setShowEditModal} onUpdateIntroduce={handleUpdateIntroduce} />}
     </>
   );
 };
