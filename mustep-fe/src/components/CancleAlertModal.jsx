@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import AlertIcon from '../../assets/AlertIcon.svg';
+import AlertIcon from '/src/assets/AlertIcon.svg';
 
 
 const Overlay = styled.div`
@@ -25,26 +25,27 @@ const Card = styled.div`
 `;
 
 const StyledAlert = styled(AlertIcon)`
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
   margin-bottom: 24px;
 `;
 
 const AlertMsg = styled.div`
-  font-size: 1.25rem;
-  font-weight: 500;
+  font-size: 26px;
+  font-weight: 600;
   color: #1f2533;
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 54px;
 `;
 
 const BtnGroup = styled.div`
-   gap 20px;
+   gap: 20px;
    display: flex;
 `;
 
 const NoBtn = styled.button`
-  width: 50%;
+  width: 249px;
+  height: 62px;
   padding: 14px 0;
   background: ${({ theme }) => theme.colors.primary};
   color: #fff;
@@ -58,7 +59,8 @@ const NoBtn = styled.button`
 `;
 
 const YesBtn = styled.button`
-  width: 16%;
+  width: 80px;
+  height: 62px;
   padding: 14px 0;
   background: #DDE0E6;
   color: #545661;
@@ -76,7 +78,7 @@ const AuthAlertModal = ({ onClose }) => {
     <Overlay>
       <Card>
         <StyledAlert />
-        <AlertMsg>인증번호를 다시 확인해주세요</AlertMsg>
+        <AlertMsg>신청을 취소하시겠습니까?</AlertMsg>
         <BtnGroup>
          <YesBtn onClick={onClose}>네</YesBtn>
          <NoBtn onClick={onClose}>다시 생각해볼게요</NoBtn>
