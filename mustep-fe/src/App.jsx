@@ -117,16 +117,14 @@ const App = () => {
             </Route>
 
             {/* 프로필 관련 페이지 라우팅 */}
-            <Route path="profile">
-              <Route
-                path=":uid"
-                element={
-                  <RequireAuth>
-                    <MyPage />
-                  </RequireAuth>
-                }
-              />
-            </Route>
+            <Route
+              path="mypage"
+              element={
+                <RequireAuth>
+                  <MyPage />
+                </RequireAuth>
+              }
+            />
           </Route>
 
           {/* 인증관련 페이지 라우팅 */}
