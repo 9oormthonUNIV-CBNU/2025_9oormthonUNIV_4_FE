@@ -241,9 +241,13 @@ const TeamDetail = () => {
   const [status, setStatus] = useState("recruiting");
 
   // 공지사항 관련 state
-  const [noticePage, setNoticePage] = useState(0);
+  const [noticePage, setNoticePage] = useState(1);
   const [notices, setNotices] = useState([]);
   const [noticeTotalPages, setNoticeTotalPages] = useState(1);
+
+  const [collabPage, setCollabPage] = useState(1);
+  const [collaboLinks, setCollaboLinks] = useState([]); // 서버에서 받아올 “현재 페이지” 링크 배열
+  const [collabTotalPages, setCollabTotalPages] = useState(1); // 서버가 알려주는 총 페이지 개수
 
   const [showTeamManageModal, setShowTeamManageModal] = useState(false);
   const [showApplyManageModal, setShowApplyManageModal] = useState(false);
@@ -252,7 +256,6 @@ const TeamDetail = () => {
 
   const [collaboes, setCollaboes] = useState(CollaboDummyData);
 
-  // TODO: useEffect 로 API에서 team 데이터, members 불러오기
   useEffect(() => {
     if (!teamId) return;
 
@@ -281,9 +284,6 @@ const TeamDetail = () => {
           // 받은 데이터를 state에 세팅
           setTeamDetail(data);
           setMembers(data.members || []);
-          // setNotices(data.notifies || []);
-          // 임시로 collaboes는 더미 데이터 사용 중이라면, API 스펙이 나오면 바꿔주세요
-          // setCollaboes(data.collaboes || []);
           setStatus(data.status);
           setLeaderName(() => {
             const leaderObj = data.members.find((m) => m.leader === true);
@@ -339,6 +339,35 @@ const TeamDetail = () => {
 
     fetchNotices();
   }, [teamId, noticePage]);
+
+  useEffect(() => {
+    if (!teamId) return;
+    const fetchCollaboLinks = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_SERVER_END_POINT
+          }/api/v1/tool-links?page=${collabPage}`,
+          {
+            headers: {
+              accept: "*/*",
+              Authorization: "Bearer " + token,
+            },
+          }
+        );
+        if (res.data && res.data.data) {
+          const { content, totalPages } = res.data.data;
+          setCollaboLinks(content);
+          setCollabTotalPages(totalPages);
+        }
+      } catch (err) {
+        console.error("협업 링크 조회 실패:", err);
+      }
+    };
+    fetchCollaboLinks();
+  }, [teamId, collabPage]);
 
   if (!teamDetail) {
     return <PageWrapper>로딩 중...</PageWrapper>;
@@ -398,15 +427,18 @@ const TeamDetail = () => {
 
             {/* 협업 관련 링크 카드 */}
             <CardContainer>
-
               <CollaboLinkCard
                 CardHeader={CardHeader}
                 ManageBtn={ManageBtn}
-                collaboes={collaboes}
-                setCollaboModal={setCollaboModal}
+                collaboes={collaboLinks}
+                setCollaboes={setCollaboLinks}
                 setShowModal={setCollaboModal}
               />
-              <Pagination page={1} total={1} onChange={() => {}} />
+              <Pagination
+                page={collabPage}
+                total={collabTotalPages}
+                onChange={(newPage) => setCollabPage(newPage)}
+              />
             </CardContainer>
           </CollaboSection>
         ) : null}
