@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router";
 import ArrowForward from "../../assets/arrow_forward.svg";
 import { LuUpload } from "react-icons/lu";
 import AttachFileModal from "../../components/modals/AttachFileModal";
+import axios from "axios";
 
 const PageWrapper = styled.main`
   padding: 40px 360px;
@@ -36,17 +37,13 @@ const Form = styled.form`
   flex-direction: column;
   gap: 32px;
 `;
-
-/* ────────────────────────────────────────────────────────────────────────── */
-/*  [ 라벨(label) ]  [ 인풋(input) ]                                           */
-/* ────────────────────────────────────────────────────────────────────────── */
 const RowGroup = styled.div`
   display: flex;
   gap: 16px;
 `;
 
 const Label = styled.label`
-  width: 5vw; /* 레이블 고정 너비 */
+  width: 10vw; /* 레이블 고정 너비 */
   display: flex;
   font-size: 1rem;
   font-weight: 600;
@@ -60,19 +57,14 @@ const SmallInput = styled.input`
   border: 1px solid ${({ theme }) => theme.colors.gray2};
   border-radius: 8px;
   color: #333;
-  width: 240px; /* 입력란 너비를 작게 조정 */
+  /* width: 240px;  */
   &::placeholder {
     color: ${({ theme }) => theme.colors.gray4};
   }
 `;
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/*  [ 질문번호 + 질문내용 ]      [ 오른쪽 도움말 ]                              */
-/*  [ 큰 텍스트영역(textarea) ]                                            */
-/*  [ 글자 수 / 최대글자 표시 ]                                            */
-/* ────────────────────────────────────────────────────────────────────────── */
 const TextareaWrapper = styled.div`
-  width: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -82,7 +74,7 @@ const QuestionRow = styled.label`
   display: flex;
 `;
 
-const QuestionLabel = styled.div`
+const QuestionLabel = styled.label`
   font-size: 1rem;
   font-weight: 600;
   color: #1f2533;
@@ -177,41 +169,71 @@ const SubmitBtn = styled.button`
   }
 `;
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/*  컴포넌트 로직                                                             */
-/* ────────────────────────────────────────────────────────────────────────── */
 const TeamApplyForm = () => {
   const navigate = useNavigate();
   const { teamId } = useParams(); // 필요 시 사용
 
-  // 텍스트영역 상태와 글자 수 상태
+  const [nickname, setNickname] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
   const [intro, setIntro] = useState("");
   const [motivation, setMotivation] = useState("");
   const [skills, setSkills] = useState("");
   const [experience, setExperience] = useState("");
   const [etc, setEtc] = useState("");
 
-  // 기본 정보 상태
-  const [nickname, setNickname] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [showFileModal, setShowFileModal] = useState(false);
 
   const MAX_LEN = 1000;
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: API 호출 로직
-    console.log({
-      nickname,
-      email,
-      phone,
-      intro,
-      motivation,
-      skills,
-      experience,
-      etc,
-    });
+
+    const formData = new FormData();
+    formData.append("name", nickname);
+    formData.append("email", email);
+    formData.append("phoneNumber", phone);
+    formData.append("introduce", intro);
+    formData.append("purpose", motivation);
+    formData.append("skillExperience", skills);
+    formData.append("strengthsExperience", experience);
+    formData.append("additionalInfo", etc);
+    formData.append("teamId", teamId);
+
+    if (selectedFiles.length > 0) {
+      formData.append("file", selectedFiles[0]);
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
+      await axios.post(
+        `${
+          import.meta.env.VITE_SERVER_END_POINT
+        }/api/v1/applications/teams/${teamId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
+
+      alert("신청이 완료되었습니다.");
+      navigate(-1);
+    } catch (err) {
+      console.error("신청 중 오류 발생:", err);
+      alert("신청 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -379,6 +401,7 @@ const TeamApplyForm = () => {
                 maxLength={500}
                 value={etc}
                 onChange={(e) => setEtc(e.target.value)}
+                required
               />
               <CharCount>{etc.length}/500</CharCount>
               <UploadBtn type="button" onClick={() => setShowFileModal(true)}>
@@ -401,7 +424,14 @@ const TeamApplyForm = () => {
           </ButtonRow>
         </Form>
       </PageWrapper>
-      {showFileModal && <AttachFileModal setShowModal={setShowFileModal} />}
+      {showFileModal && (
+        <AttachFileModal
+          setShowModal={setShowFileModal}
+          onDone={(doneFiles) => {
+            setSelectedFiles(doneFiles);
+          }}
+        />
+      )}
     </>
   );
 };

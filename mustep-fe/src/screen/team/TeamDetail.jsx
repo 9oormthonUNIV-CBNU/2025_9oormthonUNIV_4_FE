@@ -373,9 +373,11 @@ const TeamDetail = () => {
           <p>한줄소개</p>
           <h1>“{(teamDetail && teamDetail.content) || ""}”</h1>
           {!isLeader && (
-            <button onClick={() => navigate(`/teams/${teamId}/apply`)}>
-              가입 신청하러 가기
-            </button>
+            <JoinButtonWrapper>
+              <button onClick={() => navigate(`/teams/${teamId}/apply`)}>
+                가입 신청하러 가기
+              </button>
+            </JoinButtonWrapper>
           )}
         </TeamIntroduce>
 
@@ -413,11 +415,7 @@ const TeamDetail = () => {
                 setCollaboModal={setCollaboModal}
                 setShowModal={setCollaboModal}
               />
-              <Pagination
-                page={1}
-                total={1}
-                onChange={() => {}}
-              />
+              <Pagination page={1} total={1} onChange={() => {}} />
             </CardContainer>
           </CollaboSection>
         ) : null}

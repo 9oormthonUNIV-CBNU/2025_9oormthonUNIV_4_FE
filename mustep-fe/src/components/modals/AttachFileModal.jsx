@@ -42,7 +42,7 @@ const FileDropZone = styled.div`
   background: #f5f7fa;
   border: none;
   border-radius: 12px;
-  display: flex;  
+  display: flex;
   align-items: center;
   justify-content: center;
   color: #a0a3b1;
@@ -80,7 +80,7 @@ const StyledFile = styled(FileUpload)`
 `;
 
 const FileList = styled.ul`
-  width:80%;
+  width: 80%;
   list-style: none;
   padding: 0;
   margin: 0 0 24px;
@@ -93,7 +93,7 @@ const FileItem = styled.li`
   display: flex;
   align-items: center;
   padding: 8px 12px;
-  border: 2px solid ${({theme}) => theme.colors.gray2};
+  border: 2px solid ${({ theme }) => theme.colors.gray2};
   border-radius: 8px;
   background: white;
   gap: 10px;
@@ -164,54 +164,57 @@ const SubmitBtn = styled.button`
   }
 `;
 
-const AttachFileModal = ({ setShowModal }) => {
-    const [files, setFiles] = useState([]);
-    const fileInputRef = useRef();
-  
-    const addFiles = (newFiles) => {
-      const entries = Array.from(newFiles).map((file) => ({
-        id: `${file.name}-${file.size}-${Date.now()}`,
-        file,
-        progress: 0,
-        status: "uploading",
-      }));
-      setFiles((f) => [...f, ...entries]);
-      entries.forEach(simulateUpload);
-    };
-  
-    const simulateUpload = (entry) => {
-      const interval = setInterval(() => {
-        setFiles((curr) =>
-          curr.map((e) => {
-            if (e.id !== entry.id) return e;
-            const next = e.progress + 10;
-            if (next >= 100) {
-              clearInterval(interval);
-              return { ...e, progress: 100, status: "done" };
-            }
-            return { ...e, progress: next };
-          })
-        );
-      }, 200);
-    };
-  
-    const onDrop = (e) => {
-      e.preventDefault();
-      addFiles(e.dataTransfer.files);
-    };
-    const onDragOver = (e) => {
-      e.preventDefault();
-    };
-  
-    const onClickZone = () => fileInputRef.current.click();
-  
-    const removeFile = (id) => setFiles((f) => f.filter((e) => e.id !== id));
-  
-    const handleSubmit = () => {
-      // 실제 제출 로직...
-      console.log("submit:", files);
-      setShowModal(false);
-    };
+const AttachFileModal = ({ setShowModal, onDone }) => {
+  const [files, setFiles] = useState([]);
+  const fileInputRef = useRef();
+
+  const addFiles = (newFiles) => {
+    const entries = Array.from(newFiles).map((file) => ({
+      id: `${file.name}-${file.size}-${Date.now()}`,
+      file,
+      progress: 0,
+      status: "uploading",
+    }));
+    setFiles((f) => [...f, ...entries]);
+    entries.forEach(simulateUpload);
+  };
+
+  const simulateUpload = (entry) => {
+    const interval = setInterval(() => {
+      setFiles((curr) =>
+        curr.map((e) => {
+          if (e.id !== entry.id) return e;
+          const next = e.progress + 10;
+          if (next >= 100) {
+            clearInterval(interval);
+            return { ...e, progress: 100, status: "done" };
+          }
+          return { ...e, progress: next };
+        })
+      );
+    }, 200);
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    addFiles(e.dataTransfer.files);
+  };
+  const onDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const onClickZone = () => fileInputRef.current.click();
+
+  const removeFile = (id) => setFiles((f) => f.filter((e) => e.id !== id));
+
+  const handleSubmit = () => {
+    // 업로드가 모두 완료된 파일만 추려서 부모로 전달
+    const doneFiles = files
+      .filter((f) => f.status === "done")
+      .map((e) => e.file);
+    onDone(doneFiles);
+    setShowModal(false);
+  };
 
   return (
     <Overlay>
@@ -271,7 +274,7 @@ const AttachFileModal = ({ setShowModal }) => {
         </SubmitBtn>
       </Card>
     </Overlay>
-  )
-}
+  );
+};
 
-export default AttachFileModal
+export default AttachFileModal;
