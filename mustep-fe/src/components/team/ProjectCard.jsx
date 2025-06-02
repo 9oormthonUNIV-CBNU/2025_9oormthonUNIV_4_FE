@@ -34,17 +34,17 @@ const ProjectImage = styled.img`
   object-fit: cover;
 `;
 
-const ProjectCard = ({}) => {
+const ProjectCard = ({project}) => {
   return (
     <Card>
           <ProjectText>
             <div>
-              <h4>진행중인 프로젝트 이름</h4>
-              <span>회사명</span>
+              <h4>{project.title}</h4>
+              <span>{project.companyName}</span>
             </div>
-            <span>25.5.21 – 25.6.23</span>
+            <span>{project.startAt} – {project.endAt}</span>
           </ProjectText>
-          <ProjectImage src={SampleImg} alt="프로젝트 이미지" />
+          <ProjectImage src={project.imageUrl} alt="프로젝트 이미지" />
     </Card>
   );
 }

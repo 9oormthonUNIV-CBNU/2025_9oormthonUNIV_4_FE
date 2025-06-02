@@ -23,7 +23,7 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 30vw;
+  max-width: 35vw;
   width: 90%;
 `;
 
@@ -60,7 +60,7 @@ const MemberItem = styled.li`
 const InfoGroup = styled.div`
   display: flex;
   align-items: center;
-  width: 20%;
+  width: 25%;
   gap: 12px;
 `;
 
@@ -138,7 +138,7 @@ const CloseBtn = styled(CloseIcon)`
 
 
 
-const TeamManageModal = ({ members, setMembers, setShowModal }) => {
+const TeamManageModal = ({ teamId, members, setMembers, setShowModal }) => {
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
@@ -162,11 +162,39 @@ const TeamManageModal = ({ members, setMembers, setShowModal }) => {
 
 
 
-  const handleSave = () => {
-    const toRemoveIds = members.filter((m) => m.removed).map((m) => m.id);
-    // TODO: API 호출
-    console.log("삭제할 멤버:", toRemoveIds);
-    setShowModal(false);
+
+  const handleSave = async () => {
+    // removed === true인 멤버 목록 중에서 팀장(true) 아닌 것만 골라서 DELETE 요청
+    const toRemove = members.filter((m) => m.removed && !m.leader);
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("토큰 없음");
+        return;
+      }
+
+      // 여러 명을 연속으로 삭제해야 하므로, Promise.all로 묶어 비동기 요청
+      await Promise.all(
+        toRemove.map((m) =>
+          axios.delete(
+            `${import.meta.env.VITE_SERVER_END_POINT}/api/members/${teamId}/members/${m.userId}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+              },
+            }
+          )
+        )
+      );
+
+      console.log("삭제 완료된 멤버 ID들:", toRemove.map((m) => m.userId));
+      // 모달 닫기
+      setShowModal(false);
+    } catch (err) {
+      console.error("멤버 삭제 실패", err);
+    }
   };
 
   return (
@@ -181,20 +209,20 @@ const TeamManageModal = ({ members, setMembers, setShowModal }) => {
           </span>
           <Title>팀 관리하기</Title>
           <MemberList>
-            {members.map((m) => (
+            {members.filter((m) => !m.leader).map((m) => (
               <MemberItem key={m.id} removed={m.removed}>
                 <InfoGroup>
                   <UserProfile src={m.imgUrl} />
-                  <NameText>{m.nickname}</NameText>
+                  <NameText>{m.username}</NameText>
                 </InfoGroup>
                 <DetailGroup>
                   <div>
                     <UserIcon width={15} height={15}/>
-                    <span style={{color: "black", fontWeight: "bold"}}>{m.role}</span>
+                    <span style={{color: "black", fontWeight: "bold"}}>팀원</span>
                   </div>
                   <div>
                     <CalendarIcon width={15} height={15} />
-                    <span>{formatTimeAgo(new Date(m.joined))} 가입</span>
+                    <span>{(m.joinedDaysAgo)}일전 가입</span>
                   </div>
                 </DetailGroup>
                 {m.removed ? (

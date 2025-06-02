@@ -2,8 +2,7 @@
 import React from "react";
 import styled from "styled-components";
 import Pagination from "./Pagination";
-
-
+import { formatTimeAgo } from "../../../utils/Utils";
 
 const NoticeList = styled.ul`
   list-style: none;
@@ -42,7 +41,14 @@ const NoticeMeta = styled.div`
   }
 `;
 
-const NoticeCard = ({ CardHeader, ManageBtn }) => {
+const NoticeCard = ({
+  notices = [],
+  CardHeader,
+  ManageBtn,
+  page = 1,
+  totalPages = 1,
+  onChangePage,
+}) => {
   return (
     <>
       <CardHeader>
@@ -50,21 +56,25 @@ const NoticeCard = ({ CardHeader, ManageBtn }) => {
         <ManageBtn $variant="action">글쓰기</ManageBtn>
       </CardHeader>
       <NoticeList>
-        {/* 예시 3개 */}
-        {[
-          "1차 회의안 및 각자 역할에 대한 공지",
-          "다음 회의 일정 안내",
-          "디자인 리뷰 공지",
-        ].map((text, i) => (
-          <NoticeItem key={i}>
-            <NoticeText>{text}</NoticeText>
-            <NoticeMeta>
-              <p>2025.5.21</p>
-              <p>2시간전 수정</p>
-            </NoticeMeta>
+        {notices.length === 0 ? (
+          <NoticeItem>
+            <NoticeText>공지사항이 없습니다.</NoticeText>
           </NoticeItem>
-        ))}
+        ) : (
+          notices.map((notice) => (
+            <NoticeItem key={notice.id}>
+              <NoticeText>{notice.title}</NoticeText>
+              <NoticeMeta>
+                {/* 예시: createdAt = "2025-06-02 06:38" */}
+                <p>{notice.createdAt}</p>
+                <p>{formatTimeAgo(new Date(notice.lastModified))}</p>
+              </NoticeMeta>
+            </NoticeItem>
+          ))
+        )}
       </NoticeList>
+
+      <Pagination page={page} total={totalPages - 1} onChange={onChangePage} />
     </>
   );
 };
