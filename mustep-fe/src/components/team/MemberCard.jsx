@@ -110,7 +110,7 @@ const MemberCard = ({
               <MemberName>{m.username}</MemberName>
             </MemberCardHeader>
             <TextRow>
-              <UserIcon />
+              <UserIcon width={15} height={15} />
               <MemberRole>{m.leader === true ? `팀장` : "팀원"}</MemberRole>
             </TextRow>
             <TextRow>
