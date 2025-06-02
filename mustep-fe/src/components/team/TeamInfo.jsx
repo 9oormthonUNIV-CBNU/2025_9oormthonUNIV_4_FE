@@ -83,11 +83,20 @@ const DownloadBtn = styled.button`
   width: 40%;
 `;
 
-const TeamInfo = ({ status, setStatus, isLeader }) => {
+const TeamInfo = ({
+  status,
+  setStatus,
+  isLeader,
+  title,
+  fileUrl,
+  maxUserCount,
+  memberCount,
+  leaderName,
+}) => {
   return (
     <Wrapper>
-      <TeamName>팀명팀명팀명팀명</TeamName>
-      <LeaderName>팀장 이름</LeaderName>
+      <TeamName>{title}</TeamName>
+      <LeaderName>{leaderName}</LeaderName>
       <TextRow>
         <div>
           <RecruitIcon width={16} height={16} />
@@ -95,8 +104,8 @@ const TeamInfo = ({ status, setStatus, isLeader }) => {
         </div>
         {/* div는 flex하게 6명 중은 gray4, 3명은 black */}
         <CountWrapper>
-          <TotalCount>6명 중</TotalCount>
-          <CurrentCount>3명</CurrentCount>
+          <TotalCount>{maxUserCount}명 중</TotalCount>
+          <CurrentCount>{memberCount}명</CurrentCount>
         </CountWrapper>
 
         {isLeader ? (
@@ -105,25 +114,33 @@ const TeamInfo = ({ status, setStatus, isLeader }) => {
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
-              <option value="recruiting">모집중</option>
-              <option value="closed">모집마감</option>
-              <option value="paused">모집중단</option>
+              <option value="RECRUITING">모집중</option>
+              <option value="CLOSED">모집마감</option>
+              <option value="PAUSED">모집중단</option>
             </StatusSelect>
             <ArrowIcon size={20} />
           </SelectWrapper>
         ) : (
           <strong>
-            {status === "recruiting"
+            {status === "RECRUITING"
               ? "모집중"
-              : status === "closed"
+              : status === "CLOSED"
               ? "모집마감"
               : "모집중단"}
           </strong>
         )}
       </TextRow>
-      <DownloadBtn>
-        <LuDownload /> 첨부파일 다운로드
-      </DownloadBtn>
+      {fileUrl ? (
+        <DownloadBtn href={fileUrl} target="_blank" rel="noreferrer">
+          <LuDownload size={16} />
+          첨부파일 다운로드
+        </DownloadBtn>
+      ) : (
+        <DownloadBtn as="div" style={{ opacity: 0.5, cursor: "not-allowed" }}>
+          <LuDownload size={16} />
+          첨부파일 없음
+        </DownloadBtn>
+      )}
     </Wrapper>
   );
 };
