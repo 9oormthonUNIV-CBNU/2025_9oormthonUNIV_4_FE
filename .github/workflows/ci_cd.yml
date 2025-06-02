@@ -19,10 +19,11 @@ jobs:
         node-version: '20'
 
     - name: Install dependencies
-      run: npm ci
-
-    - name: Create .env file if ENV_FILE secret exists
-      run: echo "${{ secrets.ENV_FILE }}" > .env
+      run: npm install
+      
+    - name: Create .env file
+      run: |
+        echo "${{ secrets.ENV_FILE }}" > .env
 
     - name: Build Vite project
       run: npm run build
@@ -54,5 +55,5 @@ jobs:
         script: |
           echo ${{ secrets.DOCKERHUB_PASSWORD }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/9roomthon-4-team-fe:latest
-          sudo docker-compose -f docker-compose.yml down
-          sudo docker-compose -f docker-compose.yml up -d --build
+          docker-compose -f docker-compose.yml down
+          docker-compose -f docker-compose.yml up -d --build
