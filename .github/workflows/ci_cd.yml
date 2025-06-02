@@ -2,7 +2,7 @@ name: Frontend CI/CD
 
 on:
   push:
-    branches: [ "main" ]  # main 브랜치에 push될 때 자동 실행
+    branches: [ "main" ]
 
 jobs:
   ci:
@@ -20,16 +20,19 @@ jobs:
 
     - name: Install dependencies
       run: npm install
-      
+      working-directory: mustep-fe
+
     - name: Create .env file
-      run: |
-        echo "${{ secrets.ENV_FILE }}" > .env
+      run: echo "${{ secrets.ENV_FILE }}" > .env
+      working-directory: mustep-fe
 
     - name: Build Vite project
       run: npm run build
+      working-directory: mustep-fe
 
     - name: Docker build
       run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/9roomthon-4-team-fe:latest .
+      working-directory: mustep-fe
 
     - name: Docker Hub login
       uses: docker/login-action@v3
