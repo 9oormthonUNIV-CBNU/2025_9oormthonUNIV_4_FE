@@ -11,11 +11,13 @@ export default defineConfig({
       // 스프링 백엔드가 8080에서 돌아가고 있을 때,
       // /oauth2/**, /auth/** 등은 자동으로 8080으로 포워딩
       "/oauth2": {
-        target: "http://ec2-13-209-5-104.ap-northeast-2.compute.amazonaws.com:8080",
+        target:
+          "http://ec2-52-79-242-158.ap-northeast-2.compute.amazonaws.com:8080",
         changeOrigin: true,
       },
       "/auth": {
-        target: "http://ec2-13-209-5-104.ap-northeast-2.compute.amazonaws.com:8080",
+        target:
+          "http://ec2-52-79-242-158.ap-northeast-2.compute.amazonaws.com:8080",
         changeOrigin: true,
       },
       // 필요하다면 추가 엔드포인트도 등록하세요
