@@ -14,6 +14,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github.css";
+import ShareModal from "../../components/modals/ShareModal";
 
 const Container = styled.div`
   display: flex;
@@ -419,6 +420,8 @@ const ProjectDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [showShareModal, setShowShareModal] = useState(false);
+
   useEffect(() => {
     const fetchProjectDetail = async () => {
       try {
@@ -471,140 +474,132 @@ const ProjectDetail = () => {
     );
   }
 
-  
-
   return (
-    <Container>
-      <TabRow>
-        <Tab
-          to={`/projects/${projectId}`}
-          className={({ isActive }) => (isActive ? "active" : "")}
-          end
-        >
-          상세보기
-        </Tab>
-        <Tab
-          to={`/projects/${projectId}/teams`}
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          팀 목록보기
-        </Tab>
-      </TabRow>
+    <>
+      <Container>
+        <TabRow>
+          <Tab
+            to={`/projects/${projectId}`}
+            className={({ isActive }) => (isActive ? "active" : "")}
+            end
+          >
+            상세보기
+          </Tab>
+          <Tab
+            to={`/projects/${projectId}/teams`}
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            팀 목록보기
+          </Tab>
+        </TabRow>
 
-      <InfoSection>
-        {/* 좌측: 이미지(포스터) */}
-        <PosterWrapper>
-          <img
-            src={project.imageUrl}
-            alt="프로젝트 포스터"
+        <InfoSection>
+          {/* 좌측: 이미지(포스터) */}
+          <PosterWrapper>
+            <img src={project.imageUrl} alt="프로젝트 포스터" />
+          </PosterWrapper>
+
+          {/* 우측: 상세 정보 */}
+          <DetailsWrapper>
+            {/* 카테고리 */}
+            <CategoryRow>
+              {project.categories.map((cat) => (
+                <CategoryBadge key={cat.id}>{cat.title}</CategoryBadge>
+              ))}
+            </CategoryRow>
+
+            {/* 제목 */}
+            <Title>{project.title}</Title>
+
+            {/* 간단한 설명 */}
+            <Description>{project.description}</Description>
+
+            {/* 메타 정보: 주최기관 / 접수기간 / 이메일 / 상태 / D-day */}
+            <MetaRow>
+              <div>
+                <InfoLabel htmlFor="">
+                  <OrganizationIcon />
+                  주최 기관
+                </InfoLabel>
+                <span>{project.companyName}</span>
+              </div>
+              <div>
+                <InfoLabel htmlFor="">
+                  <CalendarIcon />
+                  접수 기간
+                </InfoLabel>
+                <span>
+                  {project.startAt} – {project.endAt}
+                </span>
+              </div>
+              <div>
+                <InfoLabel htmlFor="">
+                  <EmailIcon />
+                  문의 이메일
+                </InfoLabel>
+                <span> {project.email}</span>
+              </div>
+            </MetaRow>
+
+            {/* 버튼: 다운로드/공유 */}
+            <ButtonRow>
+              <DownloadButton
+                href={project.fileUrl}
+                target="_blank"
+                rel="noreferrer"
+                download
+              >
+                <LuDownload /> 추가 파일 다운로드
+              </DownloadButton>
+              <ShareButton onClick={() => setShowShareModal(true)} />
+            </ButtonRow>
+          </DetailsWrapper>
+        </InfoSection>
+        {project.relatedProjects.length !== 0 && (
+          <SimilarSection>
+            <SimilarTitle>유사한 프로젝트를 알려드려요</SimilarTitle>
+            <SimilarList>
+              <ArrowLeft />
+              {project.relatedProjects.map((sim) => (
+                <SimilarItem key={sim.id}>
+                  <img src={sim.imageUrl || null} alt={sim.title} />
+                  <SimilarTitleText>{sim.title}</SimilarTitleText>
+                </SimilarItem>
+              ))}
+              <ArrowRight />
+            </SimilarList>
+          </SimilarSection>
+        )}
+
+        <ContentsSection>
+          {/* Markdown 내용을 여기에 표시 */}
+          <ReactMarkdown
+            children={project.content}
+            rehypePlugins={[rehypeRaw, rehypeHighlight]}
           />
-        </PosterWrapper>
 
-        {/* 우측: 상세 정보 */}
-        <DetailsWrapper>
-          {/* 카테고리 */}
-          <CategoryRow>
-            {project.categories.map((cat) => (
-              <CategoryBadge key={cat.id}>{cat.title}</CategoryBadge>
-            ))}
-          </CategoryRow>
-
-          {/* 제목 */}
-          <Title>{project.title}</Title>
-
-          {/* 간단한 설명 */}
-          <Description>{project.description}</Description>
-
-          {/* 메타 정보: 주최기관 / 접수기간 / 이메일 / 상태 / D-day */}
-          <MetaRow>
-            <div>
-              <InfoLabel htmlFor="">
-                <OrganizationIcon />
-                주최 기관
-              </InfoLabel>
-              <span>{project.companyName}</span>
-            </div>
-            <div>
-              <InfoLabel htmlFor="">
-                <CalendarIcon />
-                접수 기간
-              </InfoLabel>
-              <span>
-                {project.startAt} – {project.endAt}
-              </span>
-            </div>
-            <div>
-              <InfoLabel htmlFor="">
-                <EmailIcon />
-                문의 이메일
-              </InfoLabel>
-              <span> {project.email}</span>
-            </div>
-          </MetaRow>
-
-          {/* 버튼: 다운로드/공유 */}
-          <ButtonRow>
-            <DownloadButton
-              href={project.fileUrl}
-              target="_blank"
-              rel="noreferrer"
-              download
-            >
-              <LuDownload /> 추가 파일 다운로드
-            </DownloadButton>
-            <ShareButton onClick={() => alert("공유하기 기능 구현 필요")} />
-          </ButtonRow>
-        </DetailsWrapper>
-      </InfoSection>
-      {project.relatedProjects.length !== 0 && (
-        <SimilarSection>
-          <SimilarTitle>유사한 프로젝트를 알려드려요</SimilarTitle>
-          <SimilarList>
-            <ArrowLeft />
-            {project.relatedProjects.map((sim) => (
-              <SimilarItem key={sim.id}>
-                <img
-                  src={
-                    sim.imageUrl ||
-                    null
-                  }
-                  alt={sim.title}
-                />
-                <SimilarTitleText>{sim.title}</SimilarTitleText>
-              </SimilarItem>
-            ))}
-            <ArrowRight />
-          </SimilarList>
-        </SimilarSection>
-      )}
-
-      <ContentsSection>
-        {/* Markdown 내용을 여기에 표시 */}
-        <ReactMarkdown
-          children={project.content}
-          rehypePlugins={[rehypeRaw, rehypeHighlight]}
-        />
-
-        <PrecautionWrapper>
-          <ul>
-            <li>
-              본 정보는 주최사가 제공한 자료를 바탕으로 작성된 것입니다. 내용에
-              오타 또는 오류가 있을 수 있으며, 주최사 사정으로 인하여 관련 정보
-              및 일정이변경될 수 있으니 주최사 홈페이지나 공지사항을 통해 반드시
-              공모요강을 확인하시기 바랍니다.
-            </li>
-            <li>
-              등록한 내용에 대하여 사용자가 이를 신뢰하여 취한 조치에 대해서
-              씽굿은 어떠한 책임도 지지 않습니다.
-            </li>
-            <li>
-              씽굿/Thinkcontest.com/대학문화신문사의 출처표기에 따라서 전재 및
-              재배포를 할 수 있습니다.
-            </li>
-          </ul>
-        </PrecautionWrapper>
-      </ContentsSection>
-    </Container>
+          <PrecautionWrapper>
+            <ul>
+              <li>
+                본 정보는 주최사가 제공한 자료를 바탕으로 작성된 것입니다.
+                내용에 오타 또는 오류가 있을 수 있으며, 주최사 사정으로 인하여
+                관련 정보 및 일정이변경될 수 있으니 주최사 홈페이지나 공지사항을
+                통해 반드시 공모요강을 확인하시기 바랍니다.
+              </li>
+              <li>
+                등록한 내용에 대하여 사용자가 이를 신뢰하여 취한 조치에 대해서
+                씽굿은 어떠한 책임도 지지 않습니다.
+              </li>
+              <li>
+                씽굿/Thinkcontest.com/대학문화신문사의 출처표기에 따라서 전재 및
+                재배포를 할 수 있습니다.
+              </li>
+            </ul>
+          </PrecautionWrapper>
+        </ContentsSection>
+      </Container>
+      {showShareModal && <ShareModal setShowModal={setShowShareModal} />}
+    </>
   );
 };
 
