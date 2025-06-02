@@ -165,7 +165,7 @@ const TeamInfo = ({
           첨부파일 다운로드
         </DownloadBtn>
       ) : (
-        <DownloadBtn as="div" style={{ opacity: 0.5, cursor: "not-allowed" }}>
+        <DownloadBtn as="button" style={{ opacity: 0.5, cursor: "not-allowed" }}>
           <LuDownload size={16} />
           첨부파일 없음
         </DownloadBtn>

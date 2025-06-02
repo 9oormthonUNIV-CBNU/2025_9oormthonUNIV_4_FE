@@ -158,7 +158,7 @@ const AcceptBtn = styled.button`
 `;
 
 const TeamApplication = () => {
-  const { teamId, applicationId } = useParams();
+  const { teamId, userId } = useParams();
   const navigate = useNavigate();
 
   const [appData, setAppData] = useState(null);
@@ -180,7 +180,7 @@ const TeamApplication = () => {
         const res = await axios.get(
           `${
             import.meta.env.VITE_SERVER_END_POINT
-          }/api/v1/applications/teams/${teamId}/${applicationId}`,
+          }/api/v1/applications/teams/${teamId}/${userId}`,
           {
             headers: {
               Authorization: "Bearer " + token,
@@ -263,7 +263,7 @@ const TeamApplication = () => {
       await axios.patch(
         `${
           import.meta.env.VITE_SERVER_END_POINT
-        }/api/v1/applications/teams/${teamId}/${applicationId}/status`,
+        }/api/v1/applications/teams/${teamId}/${userId}/status`,
         { status: "REJECTED" },
         {
           headers: {

@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import CheckIcon from '/src/assets/check_icon.svg';
+import { useNavigate } from "react-router";
 
 
 const Overlay = styled.div`
@@ -73,19 +74,21 @@ const YesBtn = styled.button`
   }
 `;
 
-const AuthAlertModal = ({ onClose }) => {
+const NewTeamModal = ({ setShowModal, projectId, teamId }) => {
+  const navigate = useNavigate();
+
   return (
     <Overlay>
       <Card>
         <StyledAlert />
         <AlertMsg>팀 생성이 완료되었습니다</AlertMsg>
         <BtnGroup>
-         <YesBtn onClick={onClose}>네</YesBtn>
-         <CheckBtn onClick={onClose}>내 팀 보러가기</CheckBtn>
+         <YesBtn onClick={() => {setShowModal(false); navigate(-1)}}>네</YesBtn>
+         <CheckBtn onClick={() => {setShowModal(false); navigate(`/teams/${teamId}`);}}>내 팀 보러가기</CheckBtn>
         </BtnGroup>
       </Card>
     </Overlay>
   );
 };
 
-export default AuthAlertModal;
+export default NewTeamModal;

@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { FiCalendar, FiSearch } from 'react-icons/fi';
 import thumbnailImg from "/src/assets/imgsample.png";
 import { FaCalendarAlt } from "react-icons/fa";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Container = styled.div`
   display: flex;
@@ -311,19 +310,6 @@ const ProjectList = () => {
         ))}
       </Grid>
 
-    <PaginationWrapper>
-      <Arrow>
-        <ChevronLeft size={20} />
-      </Arrow>
-      <Page active>1</Page>
-      <Page>2</Page>
-      <Page>3</Page>
-      <Page>4</Page>
-      <Page>5</Page>
-      <Arrow>
-        <ChevronRight size={20} />
-      </Arrow>
-    </PaginationWrapper>
     </>
   );
 };

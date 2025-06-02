@@ -5,6 +5,8 @@ import { useNavigate, useParams } from "react-router";
 import ArrowForward from "../../assets/arrow_forward.svg";
 import axios from "axios";
 import MarkdownEditor from "../../components/admin/MarkdownEditor";
+import NewNoticeCancleModal from "../../components/team/NewNoticeCancleModal";
+import NewNoticeCompletedModal from "../../components/team/NewNoticeCompletedModal";
 
 const PageWrapper = styled.main`
   padding: 40px 360px;
@@ -134,6 +136,8 @@ const NewNoticeForm = () => {
   const [title, setTitle] = useState("");
   const [contents, setContents] = useState("");
 
+  const [showModal, setShowModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -152,9 +156,7 @@ const NewNoticeForm = () => {
       };
 
       await axios.post(
-        `${
-          import.meta.env.VITE_SERVER_END_POINT
-        }/api/teams/${teamId}/notifies`,
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/teams/${teamId}/notifies`,
         body,
         {
           headers: {
@@ -164,8 +166,7 @@ const NewNoticeForm = () => {
         }
       );
 
-      alert("공지사항이 등록되었습니다.");
-      navigate(-1);
+      setShowCompleteModal(true);
     } catch (err) {
       console.error("공지사항 등록 실패:", err);
       alert("공지사항 등록 중 오류가 발생했습니다.");
@@ -173,50 +174,52 @@ const NewNoticeForm = () => {
   };
 
   return (
-    <PageWrapper>
-      <HeaderRow onClick={() => navigate(-1)}>
-        <ArrowForward />
-      </HeaderRow>
-      <div>
-        <Title>공지사항 글쓰기</Title>
-      </div>
+    <>
+      <PageWrapper>
+        <HeaderRow onClick={() => navigate(-1)}>
+          <ArrowForward />
+        </HeaderRow>
+        <div>
+          <Title>공지사항 글쓰기</Title>
+        </div>
 
-      <Form onSubmit={handleSubmit}>
-        <RowGroup>
-          <Label htmlFor="title">제목</Label>
-          <SmallInput
-            id="title"
-            type="text"
-            placeholder="제목을 입력해주세요."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </RowGroup>
-
-        <RowGroup>
-          <Label htmlFor="contents">내용</Label>
-          <TextareaWrapper>
-            <MarkdownEditor
-              id="contents"
-              placeholder="내용을 입력해주세요."
-              contents={contents}
-              setContents={setContents}
+        <Form onSubmit={handleSubmit}>
+          <RowGroup>
+            <Label htmlFor="title">제목</Label>
+            <SmallInput
+              id="title"
+              type="text"
+              placeholder="제목을 입력해주세요."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
             />
-            <CharCount>
-              {contents.length}
-            </CharCount>
-          </TextareaWrapper>
-        </RowGroup>
+          </RowGroup>
 
-        <ButtonRow>
-          <CancelBtn type="button" onClick={() => navigate(-1)}>
-            취소
-          </CancelBtn>
-          <SubmitBtn type="submit">올리기</SubmitBtn>
-        </ButtonRow>
-      </Form>
-    </PageWrapper>
+          <RowGroup>
+            <Label htmlFor="contents">내용</Label>
+            <TextareaWrapper>
+              <MarkdownEditor
+                id="contents"
+                placeholder="내용을 입력해주세요."
+                contents={contents}
+                setContents={setContents}
+              />
+              <CharCount>{contents.length}</CharCount>
+            </TextareaWrapper>
+          </RowGroup>
+
+          <ButtonRow>
+            <CancelBtn type="button" onClick={() => setShowModal(true)}>
+              취소
+            </CancelBtn>
+            <SubmitBtn type="submit">올리기</SubmitBtn>
+          </ButtonRow>
+        </Form>
+      </PageWrapper>
+      {showModal && <NewNoticeCancleModal setShowModal={setShowModal} />}
+      {showCompleteModal && <NewNoticeCompletedModal setShowModal={setShowCompleteModal} />}
+    </>
   );
 };
 

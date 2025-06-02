@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import AlertIcon from '/src/assets/AlertIcon.svg';
-
+import AlertIcon from "/src/assets/AlertIcon.svg";
+import { useNavigate } from "react-router";
 
 const Overlay = styled.div`
   position: fixed;
@@ -39,8 +39,8 @@ const AlertMsg = styled.div`
 `;
 
 const BtnGroup = styled.div`
-   gap: 20px;
-   display: flex;
+  gap: 20px;
+  display: flex;
 `;
 
 const NoBtn = styled.button`
@@ -62,7 +62,7 @@ const YesBtn = styled.button`
   width: 80px;
   height: 62px;
   padding: 14px 0;
-  background: #DDE0E6;
+  background: #dde0e6;
   color: #545661;
   border: none;
   border-radius: 12px;
@@ -73,19 +73,27 @@ const YesBtn = styled.button`
   }
 `;
 
-const AuthAlertModal = ({ onClose }) => {
+const NewNoticeCancleModal = ({ setShowModal }) => {
+  const navigate = useNavigate();
   return (
     <Overlay>
       <Card>
         <StyledAlert />
         <AlertMsg>작성글을 취소하시겠습니까?</AlertMsg>
         <BtnGroup>
-         <YesBtn onClick={onClose}>네</YesBtn>
-         <NoBtn onClick={onClose}>아니요</NoBtn>
+          <YesBtn
+            onClick={() => {
+              setShowModal(false);
+              navigate(-1);
+            }}
+          >
+            네
+          </YesBtn>
+          <NoBtn onClick={() => setShowModal(false)}>아니요</NoBtn>
         </BtnGroup>
       </Card>
     </Overlay>
   );
 };
 
-export default AuthAlertModal;
+export default NewNoticeCancleModal;

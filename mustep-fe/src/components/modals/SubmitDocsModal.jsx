@@ -164,9 +164,10 @@ const SubmitBtn = styled.button`
   }
 `;
 
-const SubmitDocsModal = ({ setShowModal }) => {
+const SubmitDocsModal = ({ teamId, setShowModal }) => {
   const [files, setFiles] = useState([]);
   const fileInputRef = useRef();
+  const [submitting, setSubmitting] = useState(false);
 
   const addFiles = (newFiles) => {
     const entries = Array.from(newFiles).map((file) => ({
@@ -207,10 +208,50 @@ const SubmitDocsModal = ({ setShowModal }) => {
 
   const removeFile = (id) => setFiles((f) => f.filter((e) => e.id !== id));
 
-  const handleSubmit = () => {
-    // 실제 제출 로직...
-    console.log("submit:", files);
-    setShowModal(false);
+  const handleSubmit = async () => {
+    if (files.length === 0) return;
+    // 완료된 파일만 전송 가능
+    const doneFiles = files.filter((f) => f.status === "done");
+    if (doneFiles.length === 0) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      setShowModal(false);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // 각 파일마다 별도 요청
+      for (const entry of doneFiles) {
+        const formData = new FormData();
+        formData.append("file", entry.file);
+
+        await axios.post(
+          `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/teams/${teamId}/output`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              // Content-Type를 지정하지 않으면 브라우저가 multipart boundary를 설정
+            },
+          }
+        );
+      }
+
+      alert("최종 산출물이 성공적으로 제출되었습니다.");
+    } catch (err) {
+      console.error("최종 산출물 제출 실패:", err);
+      if (err.response) {
+        alert(`제출 실패: ${err.response.data.message || ""}`);
+      } else {
+        alert("제출 중 네트워크 오류가 발생했습니다.");
+      }
+    } finally {
+      setSubmitting(false);
+      setShowModal(false);
+    }
   };
 
   return (

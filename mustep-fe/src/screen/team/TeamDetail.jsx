@@ -16,6 +16,7 @@ import CollaboManageModal from "../../components/modals/CollaboManageModal";
 import SubmitDocsModal from "../../components/modals/SubmitDocsModal";
 import axios from "axios";
 import Loading from "../../components/Loading";
+import ProfileModal from "../../components/modals/ProfileModal";
 
 const PageWrapper = styled.main`
   padding: 45px 360px;
@@ -160,9 +161,7 @@ const ManageBtn = styled.button`
     switch ($variant) {
       case "mode":
       case "action":
-        return $variant === "mode"
-          ? theme.colors.gray1
-          : theme.colors.gray1;
+        return $variant === "mode" ? theme.colors.gray1 : theme.colors.gray1;
       case "control":
         return theme.colors.white;
       default:
@@ -234,6 +233,7 @@ const TeamDetail = () => {
   const [leaderName, setLeaderName] = useState("");
   const [members, setMembers] = useState(DummyTeamMember);
   const [status, setStatus] = useState("recruiting");
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   // 공지사항
   const [noticePage, setNoticePage] = useState(1);
@@ -250,6 +250,7 @@ const TeamDetail = () => {
   const [showApplyManageModal, setShowApplyManageModal] = useState(false);
   const [showCollaboModal, setCollaboModal] = useState(false);
   const [showDocsModal, setShowDocsModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // ──────────────────────────────────────────────────────
   // 1) 로그인된 사용자 정보(userId) 가져오기
@@ -342,7 +343,9 @@ const TeamDetail = () => {
       }
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_SERVER_END_POINT}/api/teams/${teamId}/notifies?page=${noticePage}`,
+          `${
+            import.meta.env.VITE_SERVER_END_POINT
+          }/api/teams/${teamId}/notifies?page=${noticePage}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -372,7 +375,9 @@ const TeamDetail = () => {
       if (!token) return;
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/tool-links/teams/${teamId}?page=${collabPage}`,
+          `${
+            import.meta.env.VITE_SERVER_END_POINT
+          }/api/v1/tool-links/teams/${teamId}?page=${collabPage}`,
           {
             headers: {
               accept: "*/*",
@@ -392,9 +397,55 @@ const TeamDetail = () => {
     fetchCollaboLinks();
   }, [teamId, collabPage]);
 
+  const handleEndProject = async () => {
+    const confirmed = window.confirm("정말 프로젝트를 끝내시겠습니까?");
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return;
+      }
+
+      await axios.delete(
+        `${import.meta.env.VITE_SERVER_END_POINT}/api/v1/teams/${teamId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("프로젝트가 성공적으로 종료되었습니다.");
+      // 삭제 후 프로젝트 팀 목록으로 이동
+      const projectId = teamDetail.project.id;
+      navigate(`/projects/${projectId}/teams`);
+    } catch (err) {
+      if (err.response) {
+        console.error(
+          "🛑 프로젝트 종료 실패:",
+          err.response.status,
+          err.response.data
+        );
+        alert(
+          `프로젝트 종료에 실패했습니다: ${err.response.data.message || ""}`
+        );
+      } else {
+        console.error("🛑 네트워크/클라이언트 에러:", err);
+        alert("프로젝트 종료 중 오류가 발생했습니다.");
+      }
+    }
+  };
+
   // 로딩 처리: teamDetail이 아직 없으면 간단히 “로딩 중” 표시
   if (!teamDetail) {
-    return <PageWrapper><Loading /></PageWrapper>;
+    return (
+      <PageWrapper>
+        <Loading />
+      </PageWrapper>
+    );
   }
 
   return (
@@ -427,7 +478,11 @@ const TeamDetail = () => {
         <TeamIntroduce>
           {/* 팀장만 “공개 보기 모드 수정하기” 버튼 활성화 */}
           {isLeader && (
-            <ManageBtn $variant="mode" disabled={false}>
+            <ManageBtn
+              $variant="mode"
+              disabled={false}
+              onClick={() => navigate(`/teams/${teamId}/edit`)}
+            >
               공개 보기 모드 수정하기
             </ManageBtn>
           )}
@@ -492,6 +547,12 @@ const TeamDetail = () => {
               setShowApplyModal={setShowApplyManageModal}
               // 팀장이 아니면 “팀원 관리” 버튼 비활성화
               ManageBtnDisabled={!isLeader}
+              setShowProfileModal={setShowProfileModal}
+
+              onClickMember={(userId) => {
+                setSelectedUserId(userId);
+                setShowProfileModal(true);
+              }}
             />
           </MemberSection>
         )}
@@ -499,7 +560,7 @@ const TeamDetail = () => {
         {/* 팀장 전용 “프로젝트 끝내기” / “최종 산출물 제출하기” */}
         {isLeader && (
           <ActionSection>
-            <EndProjectBtn>프로젝트 끝내기</EndProjectBtn>
+            <EndProjectBtn onClick={handleEndProject} >프로젝트 끝내기</EndProjectBtn>
             <SubmitFinalBtn onClick={() => setShowDocsModal(true)}>
               최종 산출물 제출하기
             </SubmitFinalBtn>
@@ -532,6 +593,12 @@ const TeamDetail = () => {
         />
       )}
       {showDocsModal && <SubmitDocsModal setShowModal={setShowDocsModal} />}
+      {showProfileModal && (
+        <ProfileModal
+          userId={selectedUserId}
+          onClose={() => setShowProfileModal(false)}
+        />
+      )}
     </>
   );
 };
