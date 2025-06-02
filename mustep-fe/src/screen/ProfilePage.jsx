@@ -8,6 +8,7 @@ import ArrowForward from "../assets/arrow_forward.svg";
 import UserIcon from "../assets/user_icon.svg"; // 기본 아바타 아이콘
 import SchoolIcon from "../assets/school_icon.svg"; // 대학교 아이콘
 import CertIcon from "../assets/cert_icon.svg"; // 인증 완료 아이콘
+import EditIntroduce from "../components/modals/EditIntroduce";
 
 // ———— Styled Components ————
 
@@ -249,6 +250,8 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [showEditModal, setShowEditModal] = useState(false);
+
   useEffect(() => {
     const fetchMyPage = async () => {
       try {
@@ -338,122 +341,125 @@ const ProfilePage = () => {
   } = userInfo;
 
   return (
-    <PageWrapper>
-      {/* 1) 뒤로 가기 아이콘 */}
-      <HeaderRow onClick={() => navigate(-1)}>
-        <ArrowForward style={{ cursor: "pointer" }} />
-      </HeaderRow>
-      <Title>마이 페이지</Title>
-      {/* 2) 프로필 카드 */}
-      <ProfileCard>
-        <AvatarWrapper>
-          {imgUrl ? (
-            <img src={imgUrl} alt="프로필" />
-          ) : (
-            <img src={UserIcon} alt="기본 프로필" />
-          )}
-        </AvatarWrapper>
-
-        <InfoWrapper>
-          {/* 인사말: “안녕하세요, 닉네임 님” */}
-          <Greeting>
-            안녕하세요, <br />
-            {nickname} 님
-          </Greeting>
-
-          {/* 학교 + 전공 + 인증 */}
-          <SchoolRow>
-            <SchoolIcon alt="학교 아이콘" width={20} height={20} />
-            <SchoolText>
-              {university} {major}학과
-            </SchoolText>
-
-            {universityAuthenticated ? (
-              // 인증 완료
-              <CertButton disabled>
-                <CertIcon alt="인증 아이콘" />
-              </CertButton>
+    <>
+      <PageWrapper>
+        {/* 1) 뒤로 가기 아이콘 */}
+        <HeaderRow onClick={() => navigate(-1)}>
+          <ArrowForward style={{ cursor: "pointer" }} />
+        </HeaderRow>
+        <Title>마이 페이지</Title>
+        {/* 2) 프로필 카드 */}
+        <ProfileCard>
+          <AvatarWrapper>
+            {imgUrl ? (
+              <img src={imgUrl} alt="프로필" />
             ) : (
-              // 인증 안 된 경우
-              <CertButton onClick={() => navigate("/verify-university")}>
-                대학 인증하기
-              </CertButton>
+              <img src={UserIcon} alt="기본 프로필" />
             )}
-          </SchoolRow>
+          </AvatarWrapper>
 
-          {/* 자기소개 */}
-        </InfoWrapper>
-        <RightSection>
-          <IntroduceBox>{introduce}</IntroduceBox>
-          <EditIntroBtn onClick={() => navigate("/mypage/edit-introduce")}>
-            자기소개 수정하기
-          </EditIntroBtn>
-        </RightSection>
-      </ProfileCard>
+          <InfoWrapper>
+            {/* 인사말: “안녕하세요, 닉네임 님” */}
+            <Greeting>
+              안녕하세요, <br />
+              {nickname} 님
+            </Greeting>
 
-      {/* 3) 나의 프로젝트 팀 목록 */}
-      <MyProjectsWrapper>
-        <SectionTitle>나의 프로젝트 팀</SectionTitle>
-        {myTeams.length === 0 ? (
-          <div>참여 중인 팀이 없습니다.</div>
-        ) : (
-          <ProjectList>
-            {myTeams.map((team) => {
-              // team.startAt 예: "2025-06-01T20:55:18.399"
-              // “YYYY.MM.DD” 로 포맷
-              const startDate = new Date(team.startAt).toLocaleDateString(
-                "ko-KR",
-                {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
+            {/* 학교 + 전공 + 인증 */}
+            <SchoolRow>
+              <SchoolIcon alt="학교 아이콘" width={20} height={20} />
+              <SchoolText>
+                {university} {major}학과
+              </SchoolText>
+
+              {universityAuthenticated ? (
+                // 인증 완료
+                <CertButton disabled>
+                  <CertIcon alt="인증 아이콘" />
+                </CertButton>
+              ) : (
+                // 인증 안 된 경우
+                <CertButton onClick={() => navigate("/verify-university")}>
+                  대학 인증하기
+                </CertButton>
+              )}
+            </SchoolRow>
+
+            {/* 자기소개 */}
+          </InfoWrapper>
+          <RightSection>
+            <IntroduceBox>{introduce}</IntroduceBox>
+            <EditIntroBtn onClick={() => setShowEditModal(true)}>
+              자기소개 수정하기
+            </EditIntroBtn>
+          </RightSection>
+        </ProfileCard>
+
+        {/* 3) 나의 프로젝트 팀 목록 */}
+        <MyProjectsWrapper>
+          <SectionTitle>나의 프로젝트 팀</SectionTitle>
+          {myTeams.length === 0 ? (
+            <div>참여 중인 팀이 없습니다.</div>
+          ) : (
+            <ProjectList>
+              {myTeams.map((team) => {
+                // team.startAt 예: "2025-06-01T20:55:18.399"
+                // “YYYY.MM.DD” 로 포맷
+                const startDate = new Date(team.startAt).toLocaleDateString(
+                  "ko-KR",
+                  {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                  }
+                );
+
+                // status에 따라 버튼 텍스트 결정 (예시)
+                let statusLabel = "";
+                switch (team.status) {
+                  case "RECRUITING":
+                    statusLabel = "모집 중";
+                    break;
+                  case "IN_PROGRESS":
+                    statusLabel = "진행 중";
+                    break;
+                  case "FINISHED":
+                    statusLabel = "완료됨";
+                    break;
+                  default:
+                    statusLabel = team.status;
                 }
-              );
 
-              // status에 따라 버튼 텍스트 결정 (예시)
-              let statusLabel = "";
-              switch (team.status) {
-                case "RECRUITING":
-                  statusLabel = "모집 중";
-                  break;
-                case "IN_PROGRESS":
-                  statusLabel = "진행 중";
-                  break;
-                case "FINISHED":
-                  statusLabel = "완료됨";
-                  break;
-                default:
-                  statusLabel = team.status;
-              }
-
-              return (
-                <ProjectCard key={team.id}>
-                  <CardHeader>
-                    <TeamTitle>{team.title}</TeamTitle>
-                    <LeaderName>
-                      팀장: {team.leaderName || "정보 없음"}
-                    </LeaderName>
-                    <ProjectTitle>{team.projectTitle}</ProjectTitle>
-                    <div style={{display: "flex"}}>
-                      <StartDate>{startDate}</StartDate>
-                      <StatusButton
-                        status={team.status}
-                        onClick={() => {
-                          // 예: 상세 페이지로 이동
-                          navigate(`/teams/${team.id}`);
-                        }}
-                      >
-                        {statusLabel}
-                      </StatusButton>
-                    </div>
-                  </CardHeader>
-                </ProjectCard>
-              );
-            })}
-          </ProjectList>
-        )}
-      </MyProjectsWrapper>
-    </PageWrapper>
+                return (
+                  <ProjectCard key={team.id}>
+                    <CardHeader>
+                      <TeamTitle>{team.title}</TeamTitle>
+                      <LeaderName>
+                        팀장: {team.leaderName || "정보 없음"}
+                      </LeaderName>
+                      <ProjectTitle>{team.projectTitle}</ProjectTitle>
+                      <div style={{ display: "flex" }}>
+                        <StartDate>{startDate}</StartDate>
+                        <StatusButton
+                          status={team.status}
+                          onClick={() => {
+                            // 예: 상세 페이지로 이동
+                            navigate(`/teams/${team.id}`);
+                          }}
+                        >
+                          {statusLabel}
+                        </StatusButton>
+                      </div>
+                    </CardHeader>
+                  </ProjectCard>
+                );
+              })}
+            </ProjectList>
+          )}
+        </MyProjectsWrapper>
+      </PageWrapper>
+      {showEditModal && <EditIntroduce setShowModal={setShowEditModal} />}
+    </>
   );
 };
 
