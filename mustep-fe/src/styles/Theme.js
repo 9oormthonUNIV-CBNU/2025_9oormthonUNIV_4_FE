@@ -11,7 +11,8 @@ const theme = {
     gray5: '#545661', // 다크 그레이 텍스트 색상
     gray6: '#34353A', // 라이트 그레이 텍스트 색상
     white: '#FFFFFF',
-    black: 'black'
+    black: 'black',
+    warning: '#FD5252'
     // accent: '#805AD5', // 보라색과 파랑색이 적절히 합쳐진 느낌
     // input: '#E2E8F0', // 라이트 그레이 input 배경색
     // primaryForeground: '#FFFFFF', // 버튼 텍스트 색상
