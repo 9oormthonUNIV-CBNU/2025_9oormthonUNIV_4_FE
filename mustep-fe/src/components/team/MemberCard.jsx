@@ -80,7 +80,7 @@ const MemberCard = ({ members, TextRow, ManageBtn, setShowModal, setShowApplyMod
       <MemberList>
         {/* 예시: 나중에 members.map */}
         {members.map((m) => (
-          <MemberCardContainer key={m.id}>
+          <MemberCardContainer key={m.userId}>
             <MemberCardHeader>
               <ProfileImg img={m.imgUrl}/>
               <MemberName>{m.username}</MemberName>

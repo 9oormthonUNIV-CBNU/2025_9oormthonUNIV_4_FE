@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import CloseIcon from "../../assets/close_btn.svg";
 import axios from "axios";
+import { useNavigate } from "react-router";
 
 const Overlay = styled.div`
   position: fixed;
@@ -100,6 +101,7 @@ const ApplicationBtn = styled.button`
 
 const TeamApplyModal = ({ teamId, setShowModal }) => {
   const [applications, setApplications] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGetApplications = async () => {
@@ -157,7 +159,13 @@ const TeamApplyModal = ({ teamId, setShowModal }) => {
               <DetailGroup>
                 <ApplyDate>asdasd</ApplyDate>
               </DetailGroup>
-              <ApplicationBtn>신청서 보기</ApplicationBtn>
+              <ApplicationBtn
+                onClick={() =>
+                  navigate(`/teams/${teamId}/application/${a.userId}`)
+                }
+              >
+                신청서 보기
+              </ApplicationBtn>
             </MemberItem>
           ))}
         </MemberList>

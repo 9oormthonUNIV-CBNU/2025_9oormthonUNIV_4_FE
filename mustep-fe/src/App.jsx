@@ -23,6 +23,7 @@ import theme from "./styles/Theme";
 import UnivVerifyPage from "./screen/UnivVerifyPage";
 import axios from "axios";
 import RequireAuth from "../utils/RequireAuth";
+import TeamApplication from "./screen/team/TeamApplication";
 
 const App = () => {
   return (
@@ -83,6 +84,14 @@ const App = () => {
                   element={
                     <RequireAuth>
                       <TeamEditForm />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="application/:applicationId"
+                  element={
+                    <RequireAuth>
+                      <TeamApplication />
                     </RequireAuth>
                   }
                 />
