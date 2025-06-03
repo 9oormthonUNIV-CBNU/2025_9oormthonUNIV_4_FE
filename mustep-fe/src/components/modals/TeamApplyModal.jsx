@@ -135,7 +135,7 @@ const ApplicationBtn = styled.button`
   }
 `;
 
-const TeamApplyModal = ({ teamId, setShowModal }) => {
+const TeamApplyModal = ({ teamId, setShowModal, selectedUserId, setSelectedUserId }) => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -219,8 +219,8 @@ const TeamApplyModal = ({ teamId, setShowModal }) => {
   }
 
   // “PENDING” 상태인 지원서가 하나도 없으면 NoItem 화면
-  const pendingApps = applications.filter((a) => a.status === "PENDING");
-  if (pendingApps.length === 0) {
+  // const pendingApps = applications.filter((a) => a.status === "PENDING");
+  if (applications.length === 0) {
     return (
       <Overlay>
         <Card>
@@ -248,7 +248,7 @@ const TeamApplyModal = ({ teamId, setShowModal }) => {
         </span>
         <Title>팀 신청 관리</Title>
         <MemberList>
-          {pendingApps.map((a) => (
+          {applications.map((a) => (
             <MemberItem key={a.id}>
               <InfoGroup>
                 {a.imgUrl ? (
@@ -262,8 +262,10 @@ const TeamApplyModal = ({ teamId, setShowModal }) => {
                 <ApplyDate>{a.appliedAt /* 혹은 원하는 날짜 필드 */}</ApplyDate>
               </DetailGroup>
               <ApplicationBtn
-                onClick={() =>
-                  navigate(`/teams/${teamId}/application/${a.userId}`)
+                onClick={() =>{
+                  setSelectedUserId(a.userId);
+                  localStorage.setItem('selectedUserId', a.userId);
+                  navigate(`/teams/${teamId}/application/${a.userId}`)}
                 }
               >
                 신청서 보기

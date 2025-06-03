@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { NavLink, useParams, useNavigate } from "react-router";
 import axios from "axios";
 import Loading from "../../components/Loading";
+import NoItem from "../../components/NoItem";
 
 const Container = styled.div`
   display: flex;
@@ -235,7 +236,7 @@ const ProjectTeamList = () => {
         setLoading(false);
       } catch (err) {
         console.error("팀 목록 조회 실패:", err);
-      } 
+      }
     };
 
     fetchTeams();
@@ -267,7 +268,9 @@ const ProjectTeamList = () => {
 
       {/* 팀 카드 그리드 */}
       <CardsContainer>
-        {teams.map((team) => (
+      {teams.length === 0 && <div />}
+      {teams.length === 0 && <NoItem />}
+      {teams.map((team) => (
           <Card key={team.id} onClick={() => navigate(`/teams/${team.id}`)}>
             <CardHeader>
               <TeamTitle>{team.title}</TeamTitle>

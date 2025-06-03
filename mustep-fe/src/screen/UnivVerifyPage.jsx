@@ -359,11 +359,11 @@ const UnivVerifyPage = () => {
               <Label htmlFor="certNum">인증번호</Label>
               <Input
                 id="certNum"
-                placeholder="인증번호 4자리"
+                placeholder="인증번호 4~5자리"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 disabled={!isSent}
-                maxLength={4}
+                maxLength={5}
               />
             </FieldRow>
             <ButtonsRow>

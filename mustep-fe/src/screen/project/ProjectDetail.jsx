@@ -427,13 +427,6 @@ const ProjectDetail = () => {
     const fetchProjectDetail = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
-        if (!token) {
-          console.error("⚠️ 토큰이 localStorage에 없습니다.");
-          setError("프로젝트 정보를 불러오지 못했습니다.");
-          setLoading(false);
-          return;
-        }
 
         // 실제 엔드포인트를 자신의 백엔드 주소로 변경하세요.
         const response = await axios.get(
@@ -441,7 +434,6 @@ const ProjectDetail = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
             },
           }
         );

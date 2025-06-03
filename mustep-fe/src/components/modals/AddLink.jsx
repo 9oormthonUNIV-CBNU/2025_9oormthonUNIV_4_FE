@@ -127,7 +127,7 @@ const ErrorMsg = styled.div`
   margin-top: 8px;
 `;
 
-const AddLink = ({setShowModal, onNewLinkAdded}) => {
+const AddLink = ({setShowModal, onNewLinkAdded, onSetPage}) => {
   const { teamId } = useParams();
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
@@ -171,6 +171,7 @@ const AddLink = ({setShowModal, onNewLinkAdded}) => {
       // }
 
       // 모달 닫기
+      onSetPage
       setShowModal(false);
     } catch (err) {
       console.error("협업 링크 추가 실패:", err);

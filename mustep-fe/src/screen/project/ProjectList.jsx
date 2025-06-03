@@ -1,17 +1,30 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { FiCalendar, FiSearch } from 'react-icons/fi';
+import React, { useState, useEffect } from "react";
+import styled, { useTheme } from "styled-components";
+import { FiSearch } from "react-icons/fi";
 import thumbnailImg from "/src/assets/imgsample.png";
-import { FaCalendarAlt } from "react-icons/fa";
+import CalendarIcon from "../../assets/calendar_icon2.svg";
+import Loading from "../../components/Loading";
+import NoItem from "../../components/NoItem";
+import axios from "axios";
+import { NavLink, useNavigate } from "react-router";
 
 const Container = styled.div`
   display: flex;
-  padding: 3vw 18.75vw;
   flex-direction: column;
+  gap: 40px;
+  padding: 0 360px;
+  margin: 40px 0;
+
+  /* 모바일 대응 시 적절히 패딩 조절하세요 */
+  @media (max-width: 768px) {
+    padding: 0 16px;
+    margin-top: 16px;
+    gap: 24px;
+  }
 `;
 
 const Title = styled.h2`
-  display: flex;  
+  display: flex;
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 3rem;
@@ -24,26 +37,25 @@ const Left = styled.div`
 
 const TabContainer = styled.div`
   display: flex;
-  gap: 8px;
+  gap: 16px;
+  border-bottom: 3px solid ${({ theme }) => theme.colors.primary};
 `;
 
 const TabButton = styled.button`
-  background: ${({ theme }) => theme.colors.primary};
-  color: white;
-  font-weight: 500;
-  padding: 0px 0.75rem;
+  font-size: 1rem;
+  color: ${({ theme, $active }) =>
+    $active ? theme.colors.white : theme.colors.gray4};
+  padding: 8px 24px;
+  background-color: ${({ theme, $active }) =>
+    $active ? theme.colors.primary : theme.colors.gray2};
   border: none;
-  border-radius: 8px 8px 0 0;
+  border-radius: 12px 12px 0 0;
   cursor: pointer;
-  width: 8vw;
-  height: 2.5vw;
-  font-size: 1.25rem;
-`;
 
-const Underline = styled.div`
-  height: 1.2px;
-  background: #D4B7FF;
-  width: 62.5vw;
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primary_lite};
+    color: ${({ theme }) => theme.colors.white};
+  }
 `;
 
 const BottomRight = styled.div`
@@ -74,7 +86,7 @@ const SearchBox = styled.div`
     outline: none;
     font-size: 1rem;
     background: transparent;
-    color: #BDBEC7;
+    color: #333;
   }
 `;
 
@@ -95,38 +107,43 @@ const SortBox = styled.div`
   gap: 8px;
 
   .arrow {
-    color: #BDBEC7;
+    color: #bdbec7;
     font-size: 12px;
   }
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr); 
-  grid-template-rows: repeat(4, auto); 
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: auto;
   gap: 20px;
   padding: 2vw 18.75vw;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    padding: 2vw 0;
+  }
 `;
 
 const Card = styled.div`
-  border: 2px solid ${({ statusColor }) => statusColor || '#8000FF'};
+  border: 2px solid ${({ $statusColor }) => $statusColor || "#8000FF"};
   border-radius: 16px;
-  background: ${({ isDisabled }) => (isDisabled ? '#f5f5f5' : '#fff')};
+  background: ${({ $isDisabled }) => ($isDisabled ? "#f5f5f5" : "#fff")};
   padding: 24px 32px;
   display: flex;
   align-items: center;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 `;
 
 const Thumbnail = styled.div`
   width: 6.8vw;
   height: 6.8vw;
   border-radius: 8px;
-  background-image: url(${thumbnailImg});
   background-size: cover;
   background-position: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `;
 
 const Content = styled.div`
@@ -139,20 +156,19 @@ const Content = styled.div`
 const Tags = styled.div`
   display: flex;
   gap: 4px;
+  flex-wrap: wrap;
 `;
 
 const Tag = styled.span`
   background: #e2e2e2;
   color: black;
-  font-size: 14px;
+  font-size: 12px;
   padding: 4px 6px;
   border-radius: 4px;
-  width: 39px;
-  height: 17px;
   font-weight: 500;
   text-align: center;
-  display: flex;
-  align-items: center; 
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
 `;
 
@@ -160,6 +176,7 @@ const CardTitle = styled.h4`
   font-size: 20px;
   font-weight: 600;
   margin: 16px 0 4px 0;
+  line-height: 1.2;
 `;
 
 const Company = styled.div`
@@ -173,20 +190,20 @@ const Period = styled.div`
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  font-weight: 500; 
+  font-weight: 500;
 `;
 
 const Status = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;   
+  align-items: flex-end;
   flex-direction: column;
   text-align: center;
   height: 132px;
 `;
 
 const Dday = styled.div`
-  background: ${({ color }) => color || '#8000FF'};
+  background-color: #6907FF;
   color: white;
   font-size: 18px;
   font-weight: 500;
@@ -195,7 +212,35 @@ const Dday = styled.div`
   width: 60px;
   height: 22px;
   display: flex;
-  align-items: center; 
+  align-items: center;
+  justify-content: center;
+`;
+
+const Dday2 = styled.div`
+  background-color: #FD5252;
+  color: white;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 12px;
+  width: 60px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Dday3 = styled.div`
+  background-color: #545661;
+  color: white;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 12px;
+  width: 60px;
+  height: 22px;
+  display: flex;
+  align-items: center;
   justify-content: center;
 `;
 
@@ -209,22 +254,25 @@ const PaginationWrapper = styled.div`
   align-items: center;
   justify-content: center;
   gap: 16px;
-  width: 100%;  
+  width: 100%;
   height: 26px;
   padding: 20px;
   box-sizing: border-box;
   margin: 20px 0 88px 0;
 `;
 
-const Page = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    font-weight:bold;
-    color: ${({ active }) => (active ? 'black' : '#666')};
-    font-weight: ${({ active }) => (active ? 'bold' : 'normal')};
-    cursor: pointer;
+const PageNumber = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: ${({ $active }) => ($active ? "bold" : "normal")};
+  color: ${({ $active }) => ($active ? "black" : "#666")};
+  cursor: pointer;
+
+  &:hover {
+    color: black;
+  }
 `;
 
 const Arrow = styled.div`
@@ -239,40 +287,166 @@ const Arrow = styled.div`
   }
 `;
 
-const ProjectCard = ({ title, tags, company, period, dday, label, color, isDisabled }) => (
-  <Card statusColor={color} isDisabled={isDisabled}>
-    <Thumbnail $src={thumbnailImg} />
-    <Content>
-      <Tags>
-        {tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
-      </Tags>
-      <CardTitle>{title}</CardTitle>
-      <Company>{company}</Company>
-      <Period>
-        <FaCalendarAlt size={14} /> {period}
-      </Period>
-    </Content>
-    <Status>
-      <Dday color={color}>{dday}</Dday>
-      <Label>{label}</Label>
-    </Status>
-  </Card>
-);
+const ProjectCard = ({
+  projectId,
+  title,
+  categories,
+  companyName,
+  startAt,
+  endAt,
+  dday,
+  statusLabel,
+  imgUrl,
+  isDisabled,
+}) => {
+  const theme = useTheme();
+  let ddayColor = "";
+
+  if (statusLabel === "Open") {
+    ddayColor = theme.colors.primary; // 접수중
+  } else if (statusLabel === "Soon") {
+    ddayColor = theme.colors.warning; // 마감임박
+  } else {
+    ddayColor = theme.colors.gray5; // 그 외 (Closed 등)
+  }
+
+  console.log(statusLabel);
+
+  const navigate = useNavigate();
+
+  return (
+    <Card $statusColor={ddayColor} $isDisabled={isDisabled} onClick={() => navigate(`${projectId}`)}>
+      <Thumbnail
+        style={{ backgroundImage: `url(${imgUrl || thumbnailImg})` }}
+      />
+      <Content>
+        <Tags>
+          {categories.map((cat) => (
+            <Tag key={cat.id}>{cat.title}</Tag>
+          ))}
+        </Tags>
+        <CardTitle>{title}</CardTitle>
+        <Company>{companyName}</Company>
+        <Period>
+          <CalendarIcon width={14} height={14} /> {startAt} ~ {endAt}
+        </Period>
+      </Content>
+      <Status>
+        {statusLabel === "접수중" && <Dday>{dday}</Dday>}
+        {statusLabel === "접수마감" && <Dday3>{dday}</Dday3>}
+        {statusLabel === "마감임박" && <Dday2>{dday}</Dday2>}
+
+        <Label>{statusLabel}</Label>
+      </Status>
+    </Card>
+  );
+};
 
 const ProjectList = () => {
-  const [activeTab, setActiveTab] = useState('전체');
-  const tabs = ['전체', '접수중', '접수완료'];
+  const [activeTab, setActiveTab] = useState("전체");
+  const tabs = ["전체", "접수중", "접수완료"];
 
-  const sampleData = [
-    { title: '신제품 출시 기획안 아이디어', tags: ['마케팅', '디자인', '기획'], company: '회사명', period: '25.5.21 - 25.6.23', dday: 'D-34', label: '접수중', color: '#8000FF', image: '/src/assets/imgsample.png' },
-    { title: '신제품 출시 기획안 아이디어', tags: ['마케팅', '디자인', '기획'], company: '회사명', period: '25.5.21 - 25.6.23', dday: 'D-1', label: '마감임박', color: '#FF4D4F' },
-    { title: '신제품 출시 기획안 아이디어', tags: ['마케팅', '디자인', '기획'], company: '회사명', period: '25.5.21 - 25.6.23', dday: 'D-day', label: '마감일', color: '#FF4D4F' },
-    { title: '신제품 출시 기획안 아이디어', tags: ['마케팅', '디자인', '기획'], company: '회사명', period: '25.5.21 - 25.6.23', dday: 'D+2', label: '접수마감', color: '#999', isDisabled: true },
-    { title: '신제품 출시 기획안 아이디어', tags: ['마케팅', '디자인', '기획'], company: '회사명', period: '25.5.21 - 25.6.23', dday: 'D-34', label: '접수중', color: '#8000FF' },
-    { title: '신제품 출시 기획안 아이디어', tags: ['마케팅', '디자인', '기획'], company: '회사명', period: '25.5.21 - 25.6.23', dday: 'D-1', label: '마감임박', color: '#FF4D4F' },
-    { title: '신제품 출시 기획안 아이디어', tags: ['마케팅', '디자인', '기획'], company: '회사명', period: '25.5.21 - 25.6.23', dday: 'D-day', label: '마감일', color: '#FF4D4F' },
-    { title: '신제품 출시 기획안 아이디어', tags: ['마케팅', '디자인', '기획'], company: '회사명', period: '25.5.21 - 25.6.23', dday: 'D+2', label: '접수마감', color: '#999', isDisabled: true },
-  ];
+  const [projects, setProjects] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("startAt");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const statusMap = {
+    전체: "",
+    접수중: "Open",
+    접수마감: "Closed",
+    마감임박: "Soon",
+  };
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        // 기본 URL에 페이지/상태/정렬/검색어를 붙여서 호출
+        let url = `${
+          import.meta.env.VITE_SERVER_END_POINT
+        }/api/projects?page=${currentPage}&sortBy=${sortBy}`;
+
+        // status 파라미터 추가 (‘전체’는 비우기)
+        const statusParam = statusMap[activeTab];
+        if (statusParam) url += `&status=${statusParam}`;
+
+        // 검색어가 있을 때는 &keyword=… (백엔드 API 명세에 맞추세요)
+        if (searchTerm.trim() !== "") {
+          url += `&keyword=${encodeURIComponent(searchTerm.trim())}`;
+        }
+
+        const res = await axios.get(url, {
+          headers: {
+            Accept: "*/*",
+          },
+        });
+
+        // 응답 구조: { data: { content: [ … ], totalPages: X, … } }
+        const data = res.data;
+        if (data) {
+          setProjects(data.content || []);
+          setTotalPages(data.totalPages || 1);
+        }
+      } catch (err) {
+        console.error("프로젝트 조회 실패:", err);
+        setError(err.message || "데이터를 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [activeTab, currentPage, sortBy, searchTerm]);
+
+  const handleClickTab = (tab) => {
+    if (tab === activeTab) return;
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  const handleSearch = () => {
+    // Enter 또는 검색 아이콘 클릭 시 currentPage를 1로 리셋하고 실제 검색Term을 useEffect에 반영했습니다.
+    setCurrentPage(1);
+    // 그 외에는 searchTerm 변화만으로 useEffect가 트리거됩니다.
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
+  const goToPage = (pageNum) => {
+    if (pageNum < 1 || pageNum > totalPages) return;
+    setCurrentPage(pageNum);
+  };
+
+  if (loading) {
+    return (
+      <Container>
+        <Loading />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <div style={{ color: "red", textAlign: "center", margin: "2rem" }}>
+          {error}
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <>
@@ -280,23 +454,27 @@ const ProjectList = () => {
         <Left>
           <Title>기업 프로젝트</Title>
           <TabContainer>
-            {tabs.map(tab => (
+            {tabs.map((tab) => (
               <TabButton
                 key={tab}
-                isActive={activeTab === tab}
-                onClick={() => setActiveTab(tab)}
+                $active={activeTab === tab}
+                onClick={() => handleClickTab(tab)}
               >
                 {tab}
               </TabButton>
             ))}
           </TabContainer>
-          <Underline />
         </Left>
         <BottomRight>
           <Right>
             <SearchBox>
-              <input placeholder="어떤 프로젝트를 찾으시나요?" />
-              <StyledSearchIcon size={18} />
+              <input
+                placeholder="어떤 프로젝트를 찾으시나요?"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
+              <StyledSearchIcon size={18} onClick={handleSearch} />
             </SearchBox>
             <SortBox>
               시작일순 <span className="arrow">▲</span>
@@ -304,12 +482,44 @@ const ProjectList = () => {
           </Right>
         </BottomRight>
       </Container>
+
       <Grid>
-        {sampleData.map((data, i) => (
-          <ProjectCard key={i} {...data} />
-        ))}
+        {projects.length > 0 ? (
+          projects.map((data) => (
+            <ProjectCard
+              projectId={data.id}
+              key={data.id}
+              title={data.title}
+              categories={data.categories || []}
+              companyName={data.companyName}
+              startAt={data.startAt}
+              endAt={data.endAt}
+              dday={data.dday} // 백엔드가 반환하는 D-day 문자열
+              statusLabel={data.statusLabel} // “Open”, “Soon”, “Closed” 등
+              imgUrl={data.imgUrl}
+              isDisabled={data.isDisabled}
+            />
+          ))
+        ) : (
+          <NoItem />
+        )}
       </Grid>
 
+      <PaginationWrapper>
+        <Arrow onClick={() => goToPage(currentPage - 1)}>◀</Arrow>
+        {Array.from({ length: totalPages }, (_, idx) => idx + 1).map(
+          (pageNum) => (
+            <PageNumber
+              key={pageNum}
+              $active={pageNum === currentPage}
+              onClick={() => goToPage(pageNum)}
+            >
+              {pageNum}
+            </PageNumber>
+          )
+        )}
+        <Arrow onClick={() => goToPage(currentPage + 1)}>▶</Arrow>
+      </PaginationWrapper>
     </>
   );
 };

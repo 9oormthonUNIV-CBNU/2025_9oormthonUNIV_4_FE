@@ -548,6 +548,7 @@ const TeamDetail = () => {
               // 팀장이 아니면 “팀원 관리” 버튼 비활성화
               ManageBtnDisabled={!isLeader}
               setShowProfileModal={setShowProfileModal}
+              setSelectedUserId={setSelectedUserId}
 
               onClickMember={(userId) => {
                 setSelectedUserId(userId);
@@ -582,6 +583,8 @@ const TeamDetail = () => {
         <TeamApplyModal
           teamId={teamId}
           setShowModal={setShowApplyManageModal}
+          selectedUserId={selectedUserId}
+          setSelectedUserId={setSelectedUserId}
         />
       )}
       {showCollaboModal && (
@@ -589,6 +592,7 @@ const TeamDetail = () => {
           collaboes={collaboLinks}
           setCollaboes={setCollaboLinks}
           setShowModal={setCollaboModal}
+          setCollabPage={setCollabPage}
           disabled={!isLeader} // 팀장이 아니면 수정 기능 잠금
         />
       )}
