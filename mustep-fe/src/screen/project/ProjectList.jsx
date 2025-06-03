@@ -138,7 +138,7 @@ const Card = styled.div`
   }
 `;
 
-const Thumbnail = styled.div`
+const Thumbnail = styled.img`
   width: 6.8vw;
   height: 6.8vw;
   border-radius: 8px;
@@ -310,14 +310,14 @@ const ProjectCard = ({
     ddayColor = theme.colors.gray5; // 그 외 (Closed 등)
   }
 
-  console.log(statusLabel);
+  console.log(imgUrl);
 
   const navigate = useNavigate();
 
   return (
     <Card $statusColor={ddayColor} $isDisabled={isDisabled} onClick={() => navigate(`${projectId}`)}>
       <Thumbnail
-        style={{ backgroundImage: `url(${imgUrl || thumbnailImg})` }}
+        src={imgUrl || thumbnailImg}
       />
       <Content>
         <Tags>
@@ -496,7 +496,7 @@ const ProjectList = () => {
               endAt={data.endAt}
               dday={data.dday} // 백엔드가 반환하는 D-day 문자열
               statusLabel={data.statusLabel} // “Open”, “Soon”, “Closed” 등
-              imgUrl={data.imgUrl}
+              imgUrl={data.imageUrl}
               isDisabled={data.isDisabled}
             />
           ))
