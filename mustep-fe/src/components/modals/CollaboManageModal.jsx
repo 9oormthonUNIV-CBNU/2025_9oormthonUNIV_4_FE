@@ -206,6 +206,7 @@ const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal, setCollabPa
       if (res.data && res.data.data) {
         // 예시: data = [{ id, name, url }, …]
         setCollaboes(res.data.data);
+        setCollabPage(1);
       }
     } catch (err) {
       console.error("협업 링크 목록 조회 실패", err);
@@ -214,7 +215,7 @@ const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal, setCollabPa
 
   useEffect(() => {
     fetchCollaboLinks();
-  }, [teamId]);
+  }, [teamId, collaboes]);
 
   const handleRemove = async () => {
     if (selectedIds.length === 0) return;
