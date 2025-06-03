@@ -178,7 +178,7 @@ const CollaboIcon = styled.img`
   width: 30px;
 `;
 
-const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal }) => {
+const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal, setCollabPage }) => {
   const { teamId } = useParams();
   const [selectedIds, setSelectedIds] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -300,6 +300,7 @@ const CollaboManageModal = ({ collaboes, setCollaboes, setShowModal }) => {
           onNewLinkAdded={() => {
             fetchCollaboLinks();
           }}
+          onSetPage={() => setCollabPage(1)}
         />
       )}
     </>

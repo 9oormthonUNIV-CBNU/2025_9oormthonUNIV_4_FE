@@ -215,7 +215,7 @@ const TeamApplyForm = () => {
         return;
       }
 
-      await axios.post(
+      const res = await axios.post(
         `${
           import.meta.env.VITE_SERVER_END_POINT
         }/api/v1/applications/teams/${teamId}`,
@@ -229,6 +229,8 @@ const TeamApplyForm = () => {
       );
 
       alert("신청이 완료되었습니다.");
+      console.log(res.data);
+      console.log(res.response);
       navigate(-1);
     } catch (err) {
       console.error("신청 중 오류 발생:", err);

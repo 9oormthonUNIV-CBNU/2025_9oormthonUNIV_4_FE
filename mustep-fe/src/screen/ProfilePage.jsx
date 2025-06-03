@@ -15,6 +15,7 @@ import NoItem from "../components/NoItem";
 
 const PageWrapper = styled.main`
   padding: 45px 360px;
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
   gap: 30px;

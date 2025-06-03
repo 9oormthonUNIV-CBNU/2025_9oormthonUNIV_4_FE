@@ -158,8 +158,9 @@ const AcceptBtn = styled.button`
 `;
 
 const TeamApplication = () => {
-  const { teamId, userId } = useParams();
+  const { teamId } = useParams();
   const navigate = useNavigate();
+
 
   const [appData, setAppData] = useState(null);
   const [teamName, setTeamName] = useState("");
@@ -169,6 +170,7 @@ const TeamApplication = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem('selectedUserId');
     if (!token) {
       // 인증이 필요하면 로그인 페이지로 이동
       navigate("/login");
@@ -247,10 +249,11 @@ const TeamApplication = () => {
       .finally(() => {
         fetchTeamName().finally(() => setLoading(false));
       });
-  }, [teamId, applicationId, navigate]);
+  }, [teamId, navigate]);
 
   const handleReject = async () => {
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem('selectedUserId');
     if (!token) {
       navigate("/login");
       return;
@@ -285,6 +288,7 @@ const TeamApplication = () => {
     if (!ok) return;
 
     const token = localStorage.getItem("token");
+    const userId = localStorage.getItem('selectedUserId');
     if (!token) {
       navigate("/login");
       return;
@@ -293,7 +297,7 @@ const TeamApplication = () => {
       await axios.patch(
         `${
           import.meta.env.VITE_SERVER_END_POINT
-        }/api/v1/applications/teams/${teamId}/${applicationId}/status`,
+        }/api/v1/applications/teams/${teamId}/${userId}/status`,
         { status: "ACCEPT" },
         {
           headers: {

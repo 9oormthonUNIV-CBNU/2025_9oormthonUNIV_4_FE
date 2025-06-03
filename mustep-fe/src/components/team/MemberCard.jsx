@@ -79,6 +79,7 @@ const MemberCard = ({
   ManageBtn,
   setShowModal,
   setShowApplyModal,
+  setSelectedUserId,
   onClickMember, // 부모로부터 전달된 클릭 콜백
 }) => {
   return (
@@ -112,9 +113,7 @@ const MemberCard = ({
             <MemberCardContainer
               key={m.userId}
               onClick={() => {
-                if (onClickMember) {
-                  onClickMember(m.userId);
-                }
+                setSelectedUserId(m.userId)
               }}
             >
               <MemberCardHeader>
