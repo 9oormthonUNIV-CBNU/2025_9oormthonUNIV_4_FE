@@ -1,5 +1,7 @@
 // 데모용 mock 데이터입니다. 실제 백엔드 응답 스키마는 프론트 코드에서 참조하는 필드 기준으로 재구성했습니다.
 
+import posterImg from "./assets/project-poster.jpg";
+
 export const categories = [
   { id: 1, title: "IT/개발" },
   { id: 2, title: "마케팅" },
@@ -15,7 +17,7 @@ export const projects = [
     endAt: "2025-06-30",
     dday: "D-12",
     statusLabel: "Open",
-    imageUrl: null,
+    imageUrl: posterImg,
     isDisabled: false,
   },
   {
@@ -27,7 +29,7 @@ export const projects = [
     endAt: "2025-05-31",
     dday: "마감",
     statusLabel: "Closed",
-    imageUrl: null,
+    imageUrl: posterImg,
     isDisabled: true,
   },
   {
@@ -39,7 +41,7 @@ export const projects = [
     endAt: "2025-07-05",
     dday: "D-3",
     statusLabel: "Soon",
-    imageUrl: null,
+    imageUrl: posterImg,
     isDisabled: false,
   },
 ];
@@ -57,7 +59,7 @@ export const projectDetail = {
   endAt: "2025-06-30",
   email: "contact@greentech-startup.example",
   fileUrl: "",
-  imageUrl: null,
+  imageUrl: posterImg,
   categories,
   relatedProjects: [],
   dday: "D-12",
@@ -93,7 +95,9 @@ export const teamDetail = {
   memberCount: 3,
   leaderId: 1,
   status: "RECRUITING",
-  project: { id: 1, title: "고객 리서치 자동화 툴 기획" },
+  startAt: "2025-06-05T00:00:00",
+  endAt: "2025-06-25T00:00:00",
+  project: { id: 1, title: "고객 리서치 자동화 툴 기획", imageUrl: posterImg },
   members: [
     { userId: 1, username: "김연신", leader: true },
     { userId: 2, username: "김진우", leader: false },
@@ -111,8 +115,8 @@ export const notices = {
 
 export const toolLinks = {
   content: [
-    { id: 1, title: "피그마 디자인", url: "https://figma.com/example" },
-    { id: 2, title: "노션 기획 문서", url: "https://notion.so/example" },
+    { id: 1, title: "피그마 디자인", toolLink: "https://figma.com" },
+    { id: 2, title: "노션 기획 문서", toolLink: "https://notion.so" },
   ],
   totalPages: 1,
 };
@@ -124,6 +128,51 @@ export const userInfo = {
   introduce: "프론트엔드 개발을 공부하고 있습니다.",
   universityAuthenticated: true,
   imgUrl: null,
+};
+
+export const applications = [
+  {
+    id: 1,
+    userId: 4,
+    name: "이지훈",
+    appliedAt: "2025-06-02",
+    status: "PENDING",
+  },
+  {
+    id: 2,
+    userId: 5,
+    name: "박서연",
+    appliedAt: "2025-06-03",
+    status: "PENDING",
+  },
+];
+
+export const applicantProfiles = {
+  4: { imgUrl: "", nickname: "이지훈" },
+  5: { imgUrl: "", nickname: "박서연" },
+};
+
+export const applicationDetails = {
+  4: {
+    name: "이지훈",
+    email: "jihoon@example.com",
+    phoneNumber: "010-1234-5678",
+    introduce: "백엔드 개발에 관심이 많은 3학년 재학생입니다.",
+    purpose: "실무 프로젝트 경험을 쌓고 싶어 지원합니다.",
+    skillExperience: "Spring Boot, MySQL, Python 사용 경험이 있습니다.",
+    strengthsExperience: "교내 해커톤에서 백엔드를 맡아 완주한 경험이 있습니다.",
+    fileUrl: "",
+  },
+  5: {
+    name: "박서연",
+    email: "seoyeon@example.com",
+    phoneNumber: "010-9876-5432",
+    introduce: "데이터 분석과 리서치에 관심이 많습니다.",
+    purpose: "설문 데이터 자동화라는 주제가 흥미로워 지원했습니다.",
+    skillExperience: "Python, Pandas, SQL을 활용한 분석 경험이 있습니다.",
+    strengthsExperience: "학회 리서치 프로젝트에서 데이터 정리를 담당했습니다.",
+    fileUrl: "",
+  },
 };
 
 export const myTeams = [

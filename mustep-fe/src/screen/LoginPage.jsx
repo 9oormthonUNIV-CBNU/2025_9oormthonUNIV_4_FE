@@ -69,6 +69,12 @@ const BtnText = styled.p`
 
 const LoginPage = () => {
   const handleLogin = () => {
+    // demo/mock-data 브랜치 전용: 실제 백엔드가 없으므로 mock 계정으로 즉시 로그인 처리
+    if (import.meta.env.VITE_USE_MOCKS === "true") {
+      localStorage.setItem("token", "mock-token-for-demo");
+      window.location.href = "/"; // Navbar가 마운트 시점에 토큰을 읽으므로 새로고침 필요
+      return;
+    }
     window.location.href = import.meta.env.VITE_GOOGLE_OAUTH_REDIRECT;
   };
 
