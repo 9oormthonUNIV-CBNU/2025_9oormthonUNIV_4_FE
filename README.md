@@ -4,6 +4,12 @@
 
 <img width="800" alt="mustep 랜딩 페이지 실제 화면" src="docs/assets/landing.png" />
 
+<p align="center">
+  <a href="docs/기획서.md">📋 기획서</a>
+  &nbsp;·&nbsp;
+  <a href="docs/구유프젝4팀_발표.pdf">📑 발표자료</a>
+</p>
+
 <br/>
 
 ## 🛎️ 서비스 소개
